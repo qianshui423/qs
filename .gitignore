@@ -1,0 +1,13 @@
+# OSX
+#
+.DS_Store
+
+# Android/IntelliJ
+#
+build/
+.idea
+.gradle
+*.iml
+
+doc/*.java~
+out
