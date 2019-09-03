@@ -1,5 +1,7 @@
 package com.qs.core.log;
 
+import com.qs.core.model.ColorString;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;

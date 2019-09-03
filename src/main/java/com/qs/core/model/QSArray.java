@@ -1,4 +1,4 @@
-package com.qs.core;
+package com.qs.core.model;
 
 import com.qs.core.interfaces.QSAware;
 import com.qs.core.interfaces.QSStreamAware;

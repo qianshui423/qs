@@ -1,14 +1,17 @@
 package com.qs.core.parser;
 
-import com.qs.core.QSArray;
-import com.qs.core.QSObject;
 import com.qs.core.log.Logger;
+import com.qs.core.model.ParseOptions;
+import com.qs.core.model.QSArray;
+import com.qs.core.model.QSObject;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Map;
 
 public class QSParser {
 
@@ -25,6 +28,9 @@ public class QSParser {
     private QSToken mToken = null;
     private int mStatus = S_INIT;
 
+    private QSToken mParentToken = null;
+    private ArrayParserHandler mArrayParseHandler = new ArrayParserHandler();
+
     public void reset() {
         mToken = null;
         mStatus = S_INIT;
@@ -40,15 +46,19 @@ public class QSParser {
     }
 
     public QSObject<String, Object> parse(String s) throws ParseException {
+        return parse(s, new ParseOptions.Builder().build());
+    }
+
+    public QSObject<String, Object> parse(String s, ParseOptions options) throws ParseException {
         StringReader in = new StringReader(s);
         try {
-            return parse(in);
+            return parse(in, options);
         } catch (IOException e) {
             throw new ParseException(S_IN_ERROR, ParseException.ERROR_UNEXPECTED_EXCEPTION, e);
         }
     }
 
-    public QSObject<String, Object> parse(Reader in) throws IOException, ParseException {
+    public QSObject<String, Object> parse(Reader in, ParseOptions options) throws IOException, ParseException {
         reset(in);
         LinkedList<Integer> statusQueue = new LinkedList<>();
         LinkedList<Object> valueQueue = new LinkedList<>();
@@ -58,7 +68,8 @@ public class QSParser {
             switch (mStatus) {
                 case S_INIT: {
                     switch (mToken.type) {
-                        case QSToken.TYPE_AND: {
+                        case QSToken.TYPE_AND:
+                        case QSToken.TYPE_EOF: {
                             break;
                         }
                         case QSToken.TYPE_VALUE: {
@@ -87,6 +98,11 @@ public class QSParser {
                         }
                         case QSToken.TYPE_RIGHT_SQUARE: {
                             mStatus = S_IN_FINISHED_RIGHT_SQUARE;
+                            break;
+                        }
+                        case QSToken.TYPE_EQUAL_SIGN: {
+                            mStatus = S_IN_FINISHED_EQUAL_SIGN;
+                            mArrayParseHandler.collectStart(options, mParentToken);
                             break;
                         }
                         default: {
@@ -139,17 +155,26 @@ public class QSParser {
                 case S_IN_FINISHED_EQUAL_SIGN: {
                     switch (mToken.type) {
                         case QSToken.TYPE_VALUE: {
-                            mStatus = S_IN_FINISHED_VALUE;
-                            statusQueue.addLast(mStatus);
-                            valueQueue.addLast(mToken.value);
+                            if (mArrayParseHandler.isCollecting()) {
+                                mStatus = S_INIT;
+                                mArrayParseHandler.collectEnd(mToken);
+                            } else {
+                                mStatus = S_IN_FINISHED_VALUE;
+                                statusQueue.addLast(mStatus);
+                                valueQueue.addLast(mToken.value);
+                            }
                             break;
                         }
                         case QSToken.TYPE_AND:
                         case QSToken.TYPE_EOF: {
                             mStatus = S_INIT;
-                            put(qsObject, statusQueue, valueQueue);
-                            statusQueue = new LinkedList<>();
-                            valueQueue = new LinkedList<>();
+                            if (mArrayParseHandler.isCollecting()) {
+                                mArrayParseHandler.collectEnd(mToken);
+                            } else {
+                                put(qsObject, statusQueue, valueQueue);
+                                statusQueue = new LinkedList<>();
+                                valueQueue = new LinkedList<>();
+                            }
                             break;
                         }
                         default: {
@@ -175,8 +200,21 @@ public class QSParser {
                 throw new ParseException(getPosition(), ParseException.ERROR_UNEXPECTED_TOKEN, mToken);
             }
         } while (mToken.type != QSToken.TYPE_EOF);
+        appendRecordMap(qsObject);
 
         return qsObject;
+    }
+
+    private void appendRecordMap(QSObject<String, Object> qsObject) {
+        Map<String, ArrayParserHandler.ArrayRecord> recordMap = mArrayParseHandler.getRecordMap();
+        for (Map.Entry<String, ArrayParserHandler.ArrayRecord> entry : recordMap.entrySet()) {
+            ArrayParserHandler.ArrayRecord record = entry.getValue();
+            ArrayList<LinkedList<Integer>> statusQueueList = record.getStatusQueueList();
+            ArrayList<LinkedList<Object>> valueQueueList = record.getValueQueueList();
+            for (int i = 0; i < statusQueueList.size(); i++) {
+                put(qsObject, statusQueueList.get(i), valueQueueList.get(i));
+            }
+        }
     }
 
     private QSArray<Object> newArray() {
@@ -188,7 +226,6 @@ public class QSParser {
     }
 
     private void put(QSObject<String, Object> qsObject, LinkedList<Integer> statusQueue, LinkedList<Object> valueQueue) {
-        QSObject<Object, Object> value = new QSObject<>();
         Object current = qsObject;
         Object child = null;
 
@@ -259,7 +296,7 @@ public class QSParser {
                 break;
             }
             case S_IN_FINISHED_ARRAY_INDEX: {
-                int index = Integer.valueOf(valueQueue.getLast().toString());
+                int index = Integer.valueOf(String.valueOf(valueQueue.getLast()));
                 if (current instanceof QSArray) {
                     QSArray<Object> array = (QSArray<Object>) current;
                     if (index < array.size()) {
@@ -288,7 +325,7 @@ public class QSParser {
 
     private boolean isNaturalNumber(Object value) {
         try {
-            int number = Integer.valueOf(value.toString());
+            int number = Integer.valueOf(String.valueOf(value));
             return number >= 0;
         } catch (NumberFormatException e) {
             return false;
@@ -296,6 +333,7 @@ public class QSParser {
     }
 
     private void nextToken() throws IOException {
+        mParentToken = mToken;
         mToken = mLexer.yylex();
         if (mToken == null)
             mToken = new QSToken(QSToken.TYPE_EOF, null);

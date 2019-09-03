@@ -1,8 +1,8 @@
 package com.qs.core.formatter;
 
-import com.qs.core.QSArray;
-import com.qs.core.QSObject;
-import com.qs.core.log.ColorString;
+import com.qs.core.model.QSArray;
+import com.qs.core.model.QSObject;
+import com.qs.core.model.ColorString;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class QSFormatter {
                 mLevel--;
             } else if (value instanceof QSArray) {
                 mLevel++;
-                formatArray(key, (QSArray<?>) value, builder);
+                formatArray(key, i == length - 1, (QSArray<?>) value, builder);
                 mLevel--;
             } else {
                 mLevel++;
@@ -61,7 +61,7 @@ public class QSFormatter {
         }
     }
 
-    private static <T> void formatArray(String inputKey, QSArray<T> input, StringBuilder builder) {
+    private static <T> void formatArray(String inputKey, boolean last, QSArray<T> input, StringBuilder builder) {
         tabIndent(builder);
         builder.append(colorKey(inputKey));
         if (!"".equals(inputKey)) {
@@ -77,7 +77,7 @@ public class QSFormatter {
                 mLevel--;
             } else if (value instanceof QSArray) {
                 mLevel++;
-                formatArray("", (QSArray<?>) value, builder);
+                formatArray("", i == length - 1, (QSArray<?>) value, builder);
                 mLevel--;
             } else {
                 mLevel++;
@@ -94,6 +94,10 @@ public class QSFormatter {
         builder.append("\n");
         tabIndent(builder);
         builder.append("]");
+        if (!last) {
+            builder.append(",");
+            builder.append("\n");
+        }
     }
 
     private static void tabIndent(StringBuilder builder) {

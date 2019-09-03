@@ -1,4 +1,4 @@
-package com.qs.core;
+package com.qs.core.model;
 
 import com.qs.core.formatter.QSFormatter;
 import com.qs.core.interfaces.QSAware;

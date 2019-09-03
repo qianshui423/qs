@@ -1,4 +1,4 @@
-package com.qs.core.log;
+package com.qs.core.model;
 
 public enum ColorString {
     BLACK("\33[30;0m"),
