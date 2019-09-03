@@ -1,6 +1,7 @@
 package com.qs.core.parser;
 
 import com.qs.core.log.Logger;
+import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
@@ -28,8 +29,16 @@ public class QSParser {
     private QSToken mToken = null;
     private int mStatus = S_INIT;
 
+    /**
+     * 处理解析 {@link ArrayFormat#REPEAT} 格式数组
+     */
     private QSToken mParentToken = null;
-    private ArrayParserHandler mArrayParseHandler = new ArrayParserHandler();
+    private RepeatArrayHandler mRepeatArrayHandler = new RepeatArrayHandler();
+
+    /**
+     * 处理解析 {@link ArrayFormat#BRACKETS} 格式数组
+     */
+    private static final int BRACKETS_NO_INDEX = -1000;
 
     public void reset() {
         mToken = null;
@@ -102,7 +111,7 @@ public class QSParser {
                         }
                         case QSToken.TYPE_EQUAL_SIGN: {
                             mStatus = S_IN_FINISHED_EQUAL_SIGN;
-                            mArrayParseHandler.collectStart(options, mParentToken);
+                            mRepeatArrayHandler.collectStart(options, mParentToken);
                             break;
                         }
                         default: {
@@ -126,6 +135,8 @@ public class QSParser {
                         }
                         case QSToken.TYPE_RIGHT_SQUARE: {
                             mStatus = S_IN_FINISHED_RIGHT_SQUARE;
+                            statusQueue.addLast(S_IN_FINISHED_ARRAY_INDEX);
+                            valueQueue.addLast(BRACKETS_NO_INDEX);
                             break;
                         }
                         default: {
@@ -155,9 +166,9 @@ public class QSParser {
                 case S_IN_FINISHED_EQUAL_SIGN: {
                     switch (mToken.type) {
                         case QSToken.TYPE_VALUE: {
-                            if (mArrayParseHandler.isCollecting()) {
+                            if (mRepeatArrayHandler.isCollecting()) {
                                 mStatus = S_INIT;
-                                mArrayParseHandler.collectEnd(mToken);
+                                mRepeatArrayHandler.collectEnd(mToken);
                             } else {
                                 mStatus = S_IN_FINISHED_VALUE;
                                 statusQueue.addLast(mStatus);
@@ -168,8 +179,8 @@ public class QSParser {
                         case QSToken.TYPE_AND:
                         case QSToken.TYPE_EOF: {
                             mStatus = S_INIT;
-                            if (mArrayParseHandler.isCollecting()) {
-                                mArrayParseHandler.collectEnd(mToken);
+                            if (mRepeatArrayHandler.isCollecting()) {
+                                mRepeatArrayHandler.collectEnd(mToken);
                             } else {
                                 put(qsObject, statusQueue, valueQueue);
                                 statusQueue = new LinkedList<>();
@@ -206,9 +217,9 @@ public class QSParser {
     }
 
     private void appendRecordMap(QSObject<String, Object> qsObject) {
-        Map<String, ArrayParserHandler.ArrayRecord> recordMap = mArrayParseHandler.getRecordMap();
-        for (Map.Entry<String, ArrayParserHandler.ArrayRecord> entry : recordMap.entrySet()) {
-            ArrayParserHandler.ArrayRecord record = entry.getValue();
+        Map<String, RepeatArrayHandler.ArrayRecord> recordMap = mRepeatArrayHandler.getRecordMap();
+        for (Map.Entry<String, RepeatArrayHandler.ArrayRecord> entry : recordMap.entrySet()) {
+            RepeatArrayHandler.ArrayRecord record = entry.getValue();
             ArrayList<LinkedList<Integer>> statusQueueList = record.getStatusQueueList();
             ArrayList<LinkedList<Object>> valueQueueList = record.getValueQueueList();
             for (int i = 0; i < statusQueueList.size(); i++) {
@@ -244,7 +255,7 @@ public class QSParser {
                         //noinspection unchecked
                         QSObject<String, Object> object = (QSObject<String, Object>) current;
                         child = object.get(key);
-                        if (child == null) child = isNaturalNumber(valueQueue.get(i + 1)) ? newArray() : newObject();
+                        if (child == null) child = needNewArray(valueQueue.get(i + 1)) ? newArray() : newObject();
                         object.put(key, child);
                     } else {
                         String errorMsg = String.format(Locale.CHINA, "\"%s\" key conflicting, you wan't put object key into array index? please check path: %s", key, valueQueue);
@@ -257,14 +268,19 @@ public class QSParser {
                     if (current instanceof QSArray) {
                         //noinspection unchecked
                         QSArray<Object> array = (QSArray<Object>) current;
-                        if (index < array.size()) {
-                            child = array.get(index);
-                        } else if (index == array.size()) {
-                            child = isNaturalNumber(valueQueue.get(i + 1)) ? newArray() : newObject();
+                        if (isBracketsNoIndex(index)) {
+                            child = needNewArray(valueQueue.get(i + 1)) ? newArray() : newObject();
                             array.add(child);
                         } else {
-                            String errorMsg = String.format(Locale.CHINA, "can't support skip add. please check path: %s", valueQueue);
-                            throw new IllegalArgumentException(errorMsg);
+                            if (index < array.size()) {
+                                child = array.get(index);
+                            } else if (index == array.size()) {
+                                child = needNewArray(valueQueue.get(i + 1)) ? newArray() : newObject();
+                                array.add(child);
+                            } else {
+                                String errorMsg = String.format(Locale.CHINA, "can't support skip add. please check path: %s", valueQueue);
+                                throw new IllegalArgumentException(errorMsg);
+                            }
                         }
                     } else {
                         String errorMsg = String.format(Locale.CHINA, "\"%d\" index conflicting, you wan't put array index into object key? please check path: %s", index, valueQueue);
@@ -283,6 +299,7 @@ public class QSParser {
             case S_IN_FINISHED_OBJECT_KEY: {
                 String key = valueQueue.getLast().toString();
                 if (current instanceof QSObject) {
+                    //noinspection unchecked
                     QSObject<String, Object> object = (QSObject<String, Object>) current;
                     if (object.get(key) != null) {
                         String warnMsg = String.format(Locale.CHINA, "\"%s\" key repeating, rewritten. please check path: %s", key, valueQueue);
@@ -299,17 +316,21 @@ public class QSParser {
                 int index = Integer.valueOf(String.valueOf(valueQueue.getLast()));
                 if (current instanceof QSArray) {
                     QSArray<Object> array = (QSArray<Object>) current;
-                    if (index < array.size()) {
-                        if (array.get(index) != null) {
-                            String warnMsg = String.format(Locale.CHINA, "\"%s\" key repeating, rewritten. please check path: %s", index, valueQueue);
-                            Logger.warn(warnMsg);
-                        }
-                        array.set(index, pairValue);
-                    } else if (index == array.size()) {
+                    if (isBracketsNoIndex(index)) {
                         array.add(pairValue);
                     } else {
-                        String errorMsg = String.format(Locale.CHINA, "can't support skip add. please check path: %s", valueQueue);
-                        throw new IllegalArgumentException(errorMsg);
+                        if (index < array.size()) {
+                            if (array.get(index) != null) {
+                                String warnMsg = String.format(Locale.CHINA, "\"%s\" key repeating, rewritten. please check path: %s", index, valueQueue);
+                                Logger.warn(warnMsg);
+                            }
+                            array.set(index, pairValue);
+                        } else if (index == array.size()) {
+                            array.add(pairValue);
+                        } else {
+                            String errorMsg = String.format(Locale.CHINA, "can't support skip add. please check path: %s", valueQueue);
+                            throw new IllegalArgumentException(errorMsg);
+                        }
                     }
                 } else {
                     String errorMsg = String.format(Locale.CHINA, "\"%d\" index conflicting, you wan't put array index into object key? please check path: %s", index, valueQueue);
@@ -323,10 +344,23 @@ public class QSParser {
         return Integer.valueOf(statusQueue.getLast().toString()) == S_IN_FINISHED_VALUE;
     }
 
+    private boolean needNewArray(Object value) {
+        return isNaturalNumber(value) || isBracketsNoIndex(value);
+    }
+
     private boolean isNaturalNumber(Object value) {
         try {
             int number = Integer.valueOf(String.valueOf(value));
             return number >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isBracketsNoIndex(Object value) {
+        try {
+            int number = Integer.valueOf(String.valueOf(value));
+            return number == BRACKETS_NO_INDEX;
         } catch (NumberFormatException e) {
             return false;
         }

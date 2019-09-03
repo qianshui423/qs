@@ -6,53 +6,49 @@ import com.qs.core.model.ParseOptions;
 
 import java.util.*;
 
-public class ArrayParserHandler {
+// package
+class RepeatArrayHandler {
     private Map<String, ArrayRecord> mRecordMap = new LinkedHashMap<>();
 
     private String mMountedKey = "";
     private boolean mCollecting = false;
 
-    public Map<String, ArrayRecord> getRecordMap() {
+    Map<String, ArrayRecord> getRecordMap() {
         return mRecordMap;
     }
 
-    public void collectStart(ParseOptions options, QSToken parentToken) {
+    void collectStart(ParseOptions options, QSToken parentToken) {
         mCollecting = true;
         mMountedKey = String.valueOf(parentToken.value);
         ArrayRecord record = mRecordMap.get(String.valueOf(parentToken.value));
         if (record == null) {
-            record = new ArrayRecord(ArrayFormat.REPEAT);
+            record = new ArrayRecord();
             mRecordMap.put(mMountedKey, record);
         }
         record.increaseIndex(mMountedKey);
     }
 
-    public void collectEnd(QSToken token) {
+    void collectEnd(QSToken token) {
         mCollecting = false;
         ArrayRecord record = mRecordMap.get(mMountedKey);
         if (record == null) {
-            record = new ArrayRecord(ArrayFormat.REPEAT);
+            record = new ArrayRecord();
             mRecordMap.put(mMountedKey, record);
         }
         record.appendPairValue(token);
         mMountedKey = "";
     }
 
-    public boolean isCollecting() {
+    boolean isCollecting() {
         return mCollecting;
     }
 
-    public static class ArrayRecord {
-        private ArrayFormat mArrayFormat;
+    static class ArrayRecord {
         private ArrayList<LinkedList<Integer>> mStatusQueueContainer = new ArrayList<>();
         private ArrayList<LinkedList<Object>> mValueQueueContainer = new ArrayList<>();
         private int index = -1;
 
-        public ArrayRecord(ArrayFormat arrayFormat) {
-            this.mArrayFormat = arrayFormat;
-        }
-
-        public void increaseIndex(String key) {
+        void increaseIndex(String key) {
             index++;
             LinkedList<Integer> statusQueue = new LinkedList<>();
             LinkedList<Object> valueQueue = new LinkedList<>();
@@ -64,14 +60,14 @@ public class ArrayParserHandler {
             mValueQueueContainer.add(valueQueue);
         }
 
-        public void appendPairValue(QSToken token) {
+        void appendPairValue(QSToken token) {
             LinkedList<Integer> statusQueue = mStatusQueueContainer.get(mStatusQueueContainer.size() - 1);
             LinkedList<Object> valueQueue = mValueQueueContainer.get(mValueQueueContainer.size() - 1);
             statusQueue.addLast(QSParser.S_IN_FINISHED_VALUE);
             valueQueue.addLast(token.value);
         }
 
-        public ArrayList<LinkedList<Integer>> getStatusQueueList() {
+        ArrayList<LinkedList<Integer>> getStatusQueueList() {
             int size = mStatusQueueContainer.size();
             if (size == 0) {
                 return new ArrayList<>();
@@ -83,7 +79,7 @@ public class ArrayParserHandler {
             return mStatusQueueContainer;
         }
 
-        public ArrayList<LinkedList<Object>> getValueQueueList() {
+        ArrayList<LinkedList<Object>> getValueQueueList() {
             int size = mValueQueueContainer.size();
             if (size == 0) {
                 return new ArrayList<>();
