@@ -126,7 +126,7 @@ public class QSParser {
                             if (mParserHandler.isCommaMode()) {
                                 mParserHandler.switchMode(ArrayFormat.REPEAT);
                             }
-                            mParserHandler.pairValueEnd();
+                            mParserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
                         default: {
@@ -158,7 +158,7 @@ public class QSParser {
                             if (mParserHandler.isCommaMode()) {
                                 mParserHandler.switchMode(ArrayFormat.REPEAT);
                             }
-                            mParserHandler.pairValueEnd();
+                            mParserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
                         case QSToken.TYPE_COMMA: {

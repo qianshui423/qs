@@ -5,6 +5,7 @@ public class ParseException extends Exception {
     public static final int ERROR_UNEXPECTED_CHAR = 0;
     public static final int ERROR_UNEXPECTED_TOKEN = 1;
     public static final int ERROR_UNEXPECTED_EXCEPTION = 2;
+    public static final int ERROR_SKIP_ADD_EXCEPTION = 3;
 
     private int errorType;
     private Object unexpectedObject;
@@ -60,6 +61,9 @@ public class ParseException extends Exception {
                 break;
             case ERROR_UNEXPECTED_EXCEPTION:
                 sb.append("Unexpected exception at position ").append(position).append(": ").append(unexpectedObject);
+                break;
+            case ERROR_SKIP_ADD_EXCEPTION:
+                sb.append("skip add exception at position ").append(position).append(". ").append("can't support skip add. please check path").append(": ").append(unexpectedObject);
                 break;
             default:
                 sb.append("Unkown error at position ").append(position).append(".");

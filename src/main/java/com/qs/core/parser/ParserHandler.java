@@ -22,8 +22,6 @@ public class ParserHandler {
 
     private ArrayFormat mArrayFormat = ArrayFormat.INDICES;
 
-    private boolean mCollecting = false;
-
     void switchMode(ArrayFormat format) {
         mArrayFormat = format;
     }
@@ -33,16 +31,14 @@ public class ParserHandler {
     }
 
     void pairKeyStart(ParseOptions options, QSToken token) {
-        mCollecting = true;
         offerPath(token.value);
     }
 
-    void pairValueEnd() {
-        mCollecting = false;
+    void pairValueEnd(int position) throws ParseException {
         if (isCommaMode() && mValueList.size() == 1) {
             mPathQueue.pollLast();
         }
-        put(mQSObject, mPathQueue, mValueList);
+        put(position, mQSObject, mPathQueue, mValueList);
     }
 
     public QSObject<String, Object> getQSObject() {
@@ -55,10 +51,6 @@ public class ParserHandler {
         mValueList = newArray();
     }
 
-    public boolean isCollecting() {
-        return mCollecting;
-    }
-
     public void offerPath(Object path) {
         mPathQueue.offer(path);
     }
@@ -68,7 +60,7 @@ public class ParserHandler {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void put(@Nonnull QSObject<String, Object> qsObject, LinkedList<Object> pathQueue, QSArray<Object> valueList) {
+    private void put(int position, @Nonnull QSObject<String, Object> qsObject, LinkedList<Object> pathQueue, QSArray<Object> valueList) throws ParseException {
         Object parent = null; // current 对象在父节点
         Object parentPath = null; // current 对象在父节点中的 key
         Object current = qsObject;
@@ -88,11 +80,13 @@ public class ParserHandler {
                     //noinspection unchecked
                     QSArray<Object> array = (QSArray<Object>) current;
                     int pathIndex = Integer.valueOf(String.valueOf(path));
-                    if (pathIndex >= 0 && pathIndex < array.size()) {
-                        child = array.get(pathIndex);
-                    } else {
+                    if (isBracketsNoIndex(pathIndex) || pathIndex == array.size()) {
                         child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
                         array.add(child);
+                    } else if (pathIndex < array.size()) {
+                        child = array.get(pathIndex);
+                    } else {
+                        throw new ParseException(position, ParseException.ERROR_SKIP_ADD_EXCEPTION, mPathQueue);
                     }
                 } else {
                     QSObject<String, Object> convertObject = arrayToMap(current);
@@ -139,7 +133,9 @@ public class ParserHandler {
                 QSArray<Object> array = (QSArray<Object>) current;
                 int pathIndex = Integer.valueOf(String.valueOf(lastPath));
                 Object value = processValue(valueList);
-                if (pathIndex >= 0 && pathIndex < array.size()) {
+                if (isBracketsNoIndex(pathIndex) || pathIndex == array.size()) {
+                    array.add(value);
+                } else if (pathIndex < array.size()) {
                     Object existObject = array.get(pathIndex);
                     if (existObject instanceof QSArray) {
                         //noinspection unchecked
@@ -152,7 +148,7 @@ public class ParserHandler {
                         array.set(pathIndex, childArray);
                     }
                 } else {
-                    array.add(value);
+                    throw new ParseException(position, ParseException.ERROR_SKIP_ADD_EXCEPTION, mPathQueue);
                 }
             } else {
                 Object value = processValue(valueList);
