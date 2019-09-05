@@ -39,11 +39,11 @@ public class QSParser {
         return mLexer.getPosition();
     }
 
-    public QSObject<String, Object> parse(String s) throws ParseException {
+    public QSObject parse(String s) throws ParseException {
         return parse(s, new ParseOptions.Builder().build());
     }
 
-    public QSObject<String, Object> parse(String s, ParseOptions options) throws ParseException {
+    public QSObject parse(String s, ParseOptions options) throws ParseException {
         StringReader in = new StringReader(s);
         try {
             return parse(in, options);
@@ -52,7 +52,7 @@ public class QSParser {
         }
     }
 
-    public QSObject<String, Object> parse(Reader in, ParseOptions options) throws IOException, ParseException {
+    public QSObject parse(Reader in, ParseOptions options) throws IOException, ParseException {
         reset(in);
         do {
             nextToken();
@@ -211,7 +211,7 @@ public class QSParser {
             }
         } while (mToken.type != QSToken.TYPE_EOF);
 
-        QSObject<String, Object> qsObject = mParserHandler.getQSObject();
+        QSObject qsObject = mParserHandler.getQSObject();
         mParserHandler.reset();
 
         return qsObject;

@@ -12,13 +12,13 @@ public class QSFormatter {
     private static final String UNIT_TAB_SPACE = "\t";
     private static final String UNIT_SPACE = " ";
 
-    public static <K, V> String format(QSObject<K, V> input) {
+    public static String format(QSObject input) {
         StringBuilder builder = new StringBuilder(input.size() * 4);
         formatObject("", true, input, builder);
         return builder.toString();
     }
 
-    private static <K, V> void formatObject(String inputKey, boolean last, QSObject<K, V> input, StringBuilder builder) {
+    private static <K, V> void formatObject(String inputKey, boolean last, QSObject input, StringBuilder builder) {
         tabIndent(builder);
         builder.append(colorKey(inputKey));
         if (!"".equals(inputKey)) {
@@ -27,16 +27,16 @@ public class QSFormatter {
         builder.append("{\n");
         int i = 0;
         int length = input.size();
-        for (Map.Entry<K, V> entity : input.entrySet()) {
+        for (Map.Entry entity : input.entrySet()) {
             String key = entity.getKey().toString();
             Object value = entity.getValue();
             if (value instanceof QSObject) {
                 mLevel++;
-                formatObject(key, i == length - 1, (QSObject<?, ?>) value, builder);
+                formatObject(key, i == length - 1, (QSObject) value, builder);
                 mLevel--;
             } else if (value instanceof QSArray) {
                 mLevel++;
-                formatArray(key, i == length - 1, (QSArray<?>) value, builder);
+                formatArray(key, i == length - 1, (QSArray) value, builder);
                 mLevel--;
             } else {
                 mLevel++;
@@ -61,7 +61,7 @@ public class QSFormatter {
         }
     }
 
-    private static <T> void formatArray(String inputKey, boolean last, QSArray<T> input, StringBuilder builder) {
+    private static <T> void formatArray(String inputKey, boolean last, QSArray input, StringBuilder builder) {
         tabIndent(builder);
         builder.append(colorKey(inputKey));
         if (!"".equals(inputKey)) {
@@ -70,14 +70,14 @@ public class QSFormatter {
         builder.append("[\n");
         int i = 0;
         int length = input.size();
-        for (T value : input) {
+        for (Object value : input) {
             if (value instanceof QSObject) {
                 mLevel++;
-                formatObject("", i == length - 1, (QSObject<?, ?>) value, builder);
+                formatObject("", i == length - 1, (QSObject) value, builder);
                 mLevel--;
             } else if (value instanceof QSArray) {
                 mLevel++;
-                formatArray("", i == length - 1, (QSArray<?>) value, builder);
+                formatArray("", i == length - 1, (QSArray) value, builder);
                 mLevel--;
             } else {
                 mLevel++;
