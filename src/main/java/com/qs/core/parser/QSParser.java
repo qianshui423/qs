@@ -165,6 +165,10 @@ public class QSParser {
                             mStatus = S_IN_FINISHED_COMMA;
                             break;
                         }
+                        case QSToken.TYPE_DOT: {
+                            mStatus = S_IN_FINISHED_DOT;
+                            break;
+                        }
                         default: {
                             mStatus = S_IN_ERROR;
                             break;
@@ -176,7 +180,14 @@ public class QSParser {
                     if (mToken.type == QSToken.TYPE_VALUE) {
                         mStatus = S_IN_FINISHED_VALUE;
                         mParserHandler.offerValue(mToken.value);
+                    } else {
+                        mStatus = S_IN_ERROR;
                     }
+                    break;
+                }
+                case S_IN_FINISHED_DOT: {
+                    mStatus = S_IN_FINISHED_VALUE;
+                    mParserHandler.offerPath(mToken.value);
                     break;
                 }
                 case S_IN_ERROR:
