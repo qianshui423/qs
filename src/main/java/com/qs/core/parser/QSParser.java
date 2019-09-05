@@ -186,8 +186,21 @@ public class QSParser {
                     break;
                 }
                 case S_IN_FINISHED_DOT: {
-                    mStatus = S_IN_FINISHED_VALUE;
-                    mParserHandler.offerPath(mToken.value);
+                    switch (mToken.type) {
+                        case QSToken.TYPE_VALUE: {
+                            mStatus = S_IN_FINISHED_VALUE;
+                            mParserHandler.offerPath(mToken.value);
+                            break;
+                        }
+                        case QSToken.TYPE_EQUAL_SIGN: {
+                            mStatus = S_IN_FINISHED_EQUAL_SIGN;
+                            break;
+                        }
+                        default: {
+                            mStatus = S_IN_ERROR;
+                            break;
+                        }
+                    }
                     break;
                 }
                 case S_IN_ERROR:

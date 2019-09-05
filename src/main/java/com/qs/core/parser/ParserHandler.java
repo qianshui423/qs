@@ -1,14 +1,13 @@
 package com.qs.core.parser;
 
-import com.qs.core.log.Logger;
 import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public class ParserHandler {
 
@@ -68,101 +67,134 @@ public class ParserHandler {
         mValueList.add(value);
     }
 
-    private void put(QSObject<String, Object> qsObject, LinkedList<Object> pathQueue, QSArray<Object> valueList) {
+    @SuppressWarnings("ConstantConditions")
+    private void put(@Nonnull QSObject<String, Object> qsObject, LinkedList<Object> pathQueue, QSArray<Object> valueList) {
+        Object parent = null; // current 对象在父节点
+        Object parentPath = null; // current 对象在父节点中的 key
         Object current = qsObject;
         Object child = null;
         int length = pathQueue.size();
         for (int i = 0; i < length - 1; i++) {
             Object path = pathQueue.get(i);
-            if (isArrayIndex(path)) {
-                int index = Integer.valueOf(String.valueOf(path));
-                if (current instanceof QSArray) {
+            if (current instanceof QSObject) {
+                //noinspection unchecked
+                QSObject<String, Object> object = (QSObject<String, Object>) current;
+                String pathString = String.valueOf(path);
+                child = object.get(pathString);
+                if (child == null) child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
+                object.put(pathString, child);
+            } else {
+                if (isArrayIndex(path)) {
                     //noinspection unchecked
                     QSArray<Object> array = (QSArray<Object>) current;
-                    if (isBracketsNoIndex(index) || index == array.size()) {
+                    int pathIndex = Integer.valueOf(String.valueOf(path));
+                    if (pathIndex >= 0 && pathIndex < array.size()) {
+                        child = array.get(pathIndex);
+                    } else {
                         child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
                         array.add(child);
-                    } else if (index < array.size()) {
-                        child = array.get(index);
-                    } else {
-                        String errorMsg = String.format(Locale.CHINA, "can't support skip add. please check path: %s", mPathQueue);
-                        throw new IllegalArgumentException(errorMsg);
                     }
                 } else {
-                    String errorMsg = String.format(Locale.CHINA, "\"%d\" index conflicting, you wan't put array index into object key? please check path: %s", index, mPathQueue);
-                    throw new IllegalArgumentException(errorMsg);
-                }
-            } else {
-                String key = String.valueOf(path);
-                if (current instanceof QSObject) {
-                    //noinspection unchecked
-                    QSObject<String, Object> object = (QSObject<String, Object>) current;
-                    child = object.get(key);
-                    if (child == null) child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
-                    object.put(key, child);
-                } else {
-                    String errorMsg = String.format(Locale.CHINA, "\"%s\" key conflicting, you wan't put object key into array index? please check path: %s", key, mPathQueue);
-                    throw new IllegalArgumentException(errorMsg);
+                    QSObject<String, Object> convertObject = arrayToMap(current);
+                    String pathString = String.valueOf(path);
+                    child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
+                    convertObject.put(pathString, child);
+                    connectToParent(parent, parentPath, convertObject);
                 }
             }
+            parentPath = path;
+            parent = current;
             current = child;
         }
 
         Object lastPath = pathQueue.peekLast();
-        if (isArrayIndex(lastPath)) {
-            int index = Integer.valueOf(String.valueOf(lastPath));
-            if (current instanceof QSArray) {
-                //noinspection unchecked
-                QSArray<Object> array = (QSArray<Object>) current;
-                if (isBracketsNoIndex(index) || index == array.size()) {
-                    array.add(processValue(valueList));
-                } else if (index < array.size()) {
-                    if (array.get(index) != null) {
-                        String warnMsg = String.format(Locale.CHINA, "\"%s\" key repeating, rewritten. please check path: %s", index, mPathQueue);
-                        Logger.warn(warnMsg);
+        if (current instanceof QSObject) {
+            //noinspection unchecked
+            QSObject<String, Object> object = (QSObject<String, Object>) current;
+            String pathString = String.valueOf(lastPath);
+            Object value = processValue(valueList);
+            if (object.containsKey(pathString)) {
+                Object existObject = object.get(pathString);
+                if (existObject instanceof QSArray) {
+                    //noinspection unchecked
+                    QSArray<Object> existArray = ((QSArray<Object>) existObject);
+                    if (value instanceof QSArray) {
+                        //noinspection unchecked
+                        existArray.addAll((QSArray<Object>) value);
+                    } else {
+                        existArray.add(value);
                     }
-                    array.set(index, processValue(valueList));
                 } else {
-                    String errorMsg = String.format(Locale.CHINA, "can't support skip add. please check path: %s", mPathQueue);
-                    throw new IllegalArgumentException(errorMsg);
+                    QSArray<Object> array = newArray();
+                    array.add(object.get(pathString));
+                    array.add(value);
+                    object.put(pathString, array);
                 }
             } else {
-                String errorMsg = String.format(Locale.CHINA, "\"%d\" index conflicting, you wan't put array index into object key? please check path: %s", index, mPathQueue);
-                throw new IllegalArgumentException(errorMsg);
+                object.put(pathString, value);
             }
         } else {
-            String key = String.valueOf(lastPath);
-            if (current instanceof QSObject) {
+            if (isArrayIndex(lastPath)) {
                 //noinspection unchecked
-                QSObject<String, Object> object = (QSObject<String, Object>) current;
+                QSArray<Object> array = (QSArray<Object>) current;
+                int pathIndex = Integer.valueOf(String.valueOf(lastPath));
                 Object value = processValue(valueList);
-                if (object.containsKey(key)) {
-                    Object existObject = object.get(key);
+                if (pathIndex >= 0 && pathIndex < array.size()) {
+                    Object existObject = array.get(pathIndex);
                     if (existObject instanceof QSArray) {
                         //noinspection unchecked
                         QSArray<Object> existArray = ((QSArray<Object>) existObject);
-                        if (value instanceof QSArray) {
-                            //noinspection unchecked
-                            existArray.addAll((QSArray<Object>) value);
-                        } else {
-                            existArray.add(value);
-                        }
+                        existArray.add(value);
                     } else {
-                        QSArray<Object> array = newArray();
-                        array.add(object.get(key));
-                        array.add(value);
-                        object.put(key, array);
+                        QSArray<Object> childArray = newArray();
+                        childArray.add(existObject);
+                        childArray.add(value);
+                        array.set(pathIndex, childArray);
                     }
                 } else {
-                    object.put(key, value);
+                    array.add(value);
                 }
             } else {
-                String errorMsg = String.format(Locale.CHINA, "\"%s\" key conflicting, you wan't put object key into array index? please check path: %s", key, mPathQueue);
-                throw new IllegalArgumentException(errorMsg);
+                Object value = processValue(valueList);
+                if (current instanceof QSArray) {
+                    QSObject<String, Object> convertObject = arrayToMap(current);
+                    convertObject.put(String.valueOf(lastPath), value);
+                    connectToParent(parent, parentPath, convertObject);
+                } else {
+                    QSArray<Object> newArray = newArray();
+                    newArray.add(current);
+                    QSObject<String, Object> newObject = newObject();
+                    newObject.put(String.valueOf(lastPath), value);
+                    newArray.add(newObject);
+                    connectToParent(parent, parentPath, newArray);
+                }
             }
         }
         mPathQueue = new LinkedList<>();
         mValueList = newArray();
+    }
+
+    private void connectToParent(Object parent, Object parentPath, Object linkObject) {
+        if (parent instanceof QSObject) {
+            //noinspection unchecked
+            QSObject<String, Object> parentObject = (QSObject<String, Object>) parent;
+            parentObject.put(String.valueOf(parentPath), linkObject);
+        } else {
+            //noinspection unchecked
+            QSArray<Object> parentArray = (QSArray<Object>) parent;
+            parentArray.set(Integer.valueOf(String.valueOf(parentPath)), linkObject);
+        }
+    }
+
+    private QSObject<String, Object> arrayToMap(Object array) {
+        //noinspection unchecked
+        QSArray<Object> qsArray = (QSArray<Object>) array;
+        final int size = qsArray.size();
+        final QSObject<String, Object> qsObject = newObject();
+        for (int i = 0; i < size; ++i) {
+            qsObject.put(String.valueOf(i), qsArray.get(i));
+        }
+        return qsObject;
     }
 
     private Object processValue(List<Object> valueList) {
