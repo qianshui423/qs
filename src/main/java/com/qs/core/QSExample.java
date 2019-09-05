@@ -21,6 +21,8 @@ public class QSExample {
             System.out.println(qsObject);
             String qsString = qsObject.toQString();
             System.out.println(qsString);
+            String jsonString = qsObject.toJsonString();
+            System.out.println(jsonString);
         } catch (ParseException e) {
             e.printStackTrace();
         }

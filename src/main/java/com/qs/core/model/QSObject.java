@@ -26,6 +26,11 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
     }
 
     @Override
+    public String toJsonString() {
+        return Stringify.toJsonString(this);
+    }
+
+    @Override
     public String toString() {
         return QSFormatter.format(this);
     }

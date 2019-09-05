@@ -58,4 +58,44 @@ public class Stringify {
         }
         return sb.toString();
     }
+
+    public static String toJsonString(QSObject object) {
+        StringBuilder sb = new StringBuilder(33);
+        sb.append("{");
+        for (Map.Entry<String, Object> entry : object.entrySet()) {
+            sb.append('"').append(entry.getKey()).append("\":");
+            toJsonString(entry.getValue(), sb);
+        }
+        if (sb.length() > 1) sb.deleteCharAt(sb.length() - 1);
+        sb.append("}");
+        return sb.toString();
+    }
+
+    private static String toJsonString(QSArray array) {
+        StringBuilder sb = new StringBuilder(33);
+        sb.append("[");
+        for (Object value : array) {
+            toJsonString(value, sb);
+        }
+        if (sb.length() > 1) sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+        return sb.toString();
+    }
+
+    private static void toJsonString(Object value, StringBuilder sb) {
+        if (value instanceof String) {
+            sb.append('"').append((String) value).append('"');
+        } else if (value instanceof QSArray) {
+            sb.append(toJsonString((QSArray) value));
+        } else if (value instanceof QSObject) {
+            sb.append(toJsonString((QSObject) value));
+        } else if (value instanceof Number || value instanceof Boolean) {
+            sb.append(value.toString());
+        } else if (value == null) {
+            sb.append("null");
+        } else {
+            sb.append('"').append(value.toString()).append('"');
+        }
+        sb.append(',');
+    }
 }
