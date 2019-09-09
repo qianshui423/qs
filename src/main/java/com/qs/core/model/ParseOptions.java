@@ -22,10 +22,10 @@ public class ParseOptions extends Options {
     private boolean parseArrays;
     private boolean comma;
 
-    public ParseOptions(String delimiter, boolean allowDots, boolean strictNullHandling, String charset,
+    public ParseOptions(boolean allowDots, boolean strictNullHandling,
                         int depth, int parameterLimit, boolean ignoreQueryPrefix, int arrayLimit,
                         boolean parseArrays, boolean comma) {
-        super(delimiter, allowDots, strictNullHandling, charset);
+        super(allowDots, strictNullHandling);
         this.depth = depth;
         this.parameterLimit = parameterLimit;
         this.ignoreQueryPrefix = ignoreQueryPrefix;
@@ -96,11 +96,6 @@ public class ParseOptions extends Options {
             return this;
         }
 
-        public Builder setDelimiter(String delimiter) {
-            super.setDelimiter(delimiter);
-            return this;
-        }
-
         public Builder setAllowDots(boolean allowDots) {
             super.setAllowDots(allowDots);
             return this;
@@ -113,8 +108,7 @@ public class ParseOptions extends Options {
 
         public ParseOptions build() {
             Options options = super.build();
-            return new ParseOptions(options.getDelimiter(), options.isAllowDots(),
-                    options.isStrictNullHandling(), options.getCharset(),
+            return new ParseOptions(options.isAllowDots(), options.isStrictNullHandling(),
                     depth, parameterLimit, ignoreQueryPrefix, arrayLimit, parseArrays, comma);
         }
     }

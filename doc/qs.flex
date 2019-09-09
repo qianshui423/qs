@@ -14,10 +14,6 @@ package com.qs.core.parser;
 
 %char
 
-INT = [-]?[0-9]+
-DOUBLE = {INT}((\.[0-9]+)?([eE][-+]?[0-9]+)?)
-BOOLEAN = true|false
-NULL = null
 UNESCAPED_CH = [^\[\]=,\.&]
 
 LEFT_SQUARE = \[
@@ -29,10 +25,6 @@ AND = &
 %%
 
 <YYINITIAL> {
-          {INT}				{ Long val=Long.valueOf(yytext()); return new QSToken(QSToken.TYPE_VALUE, val); }
-          {DOUBLE}			{ Double val=Double.valueOf(yytext()); return new QSToken(QSToken.TYPE_VALUE, val); }
-          {BOOLEAN}		    { Boolean val=Boolean.valueOf(yytext()); return new QSToken(QSToken.TYPE_VALUE, val); }
-          {NULL}			{ return new QSToken(QSToken.TYPE_VALUE, null); }
           {UNESCAPED_CH}+	{ return new QSToken(QSToken.TYPE_VALUE, yytext()); }
 }
 <YYINITIAL> {LEFT_SQUARE} 	{ return new QSToken(QSToken.TYPE_LEFT_SQUARE, null); }

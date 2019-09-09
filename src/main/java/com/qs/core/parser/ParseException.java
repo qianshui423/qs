@@ -7,12 +7,12 @@ public class ParseException extends Exception {
     public static final int ERROR_UNEXPECTED_EXCEPTION = 2;
     public static final int ERROR_SKIP_ADD_EXCEPTION = 3;
 
-    private int errorType;
-    private Object unexpectedObject;
-    private int position;
+    private int mErrorType;
+    private Object mUnexpectedObject;
+    private int mPosition;
 
-    public ParseException(int errorType) {
-        this(-1, errorType, null);
+    public ParseException(int mErrorType) {
+        this(-1, mErrorType, null);
     }
 
     public ParseException(int errorType, Object unexpectedObject) {
@@ -20,53 +20,53 @@ public class ParseException extends Exception {
     }
 
     public ParseException(int position, int errorType, Object unexpectedObject) {
-        this.position = position;
-        this.errorType = errorType;
-        this.unexpectedObject = unexpectedObject;
+        this.mPosition = position;
+        this.mErrorType = errorType;
+        this.mUnexpectedObject = unexpectedObject;
     }
 
     public int getErrorType() {
-        return errorType;
+        return mErrorType;
     }
 
     public void setErrorType(int errorType) {
-        this.errorType = errorType;
+        this.mErrorType = errorType;
     }
 
     public int getPosition() {
-        return position;
+        return mPosition;
     }
 
     public void setPosition(int position) {
-        this.position = position;
+        this.mPosition = position;
     }
 
     public Object getUnexpectedObject() {
-        return unexpectedObject;
+        return mUnexpectedObject;
     }
 
     public void setUnexpectedObject(Object unexpectedObject) {
-        this.unexpectedObject = unexpectedObject;
+        this.mUnexpectedObject = unexpectedObject;
     }
 
+    @Override
     public String getMessage() {
-        StringBuffer sb = new StringBuffer();
-
-        switch (errorType) {
+        StringBuilder sb = new StringBuilder();
+        switch (mErrorType) {
             case ERROR_UNEXPECTED_CHAR:
-                sb.append("Unexpected character (").append(unexpectedObject).append(") at position ").append(position).append(".");
+                sb.append("Unexpected character (").append(mUnexpectedObject).append(") at mPosition ").append(mPosition).append(".");
                 break;
             case ERROR_UNEXPECTED_TOKEN:
-                sb.append("Unexpected token ").append(unexpectedObject).append(" at position ").append(position).append(".");
+                sb.append("Unexpected token ").append(mUnexpectedObject).append(" at mPosition ").append(mPosition).append(".");
                 break;
             case ERROR_UNEXPECTED_EXCEPTION:
-                sb.append("Unexpected exception at position ").append(position).append(": ").append(unexpectedObject);
+                sb.append("Unexpected exception at mPosition ").append(mPosition).append(": ").append(mUnexpectedObject);
                 break;
             case ERROR_SKIP_ADD_EXCEPTION:
-                sb.append("skip add exception at position ").append(position).append(". ").append("can't support skip add. please check path").append(": ").append(unexpectedObject);
+                sb.append("skip add exception at mPosition ").append(mPosition).append(". ").append("can't support skip add. please check path").append(": ").append(mUnexpectedObject);
                 break;
             default:
-                sb.append("Unkown error at position ").append(position).append(".");
+                sb.append("Unkown error at mPosition ").append(mPosition).append(".");
                 break;
         }
         return sb.toString();

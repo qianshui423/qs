@@ -33,10 +33,8 @@ class QSLex {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED = 
-    "\46\0\1\17\4\0\1\5\1\23\1\1\1\3\1\0\12\2\3\0"+
-    "\1\22\7\0\1\4\25\0\1\20\1\0\1\21\3\0\1\13\3\0"+
-    "\1\11\1\12\5\0\1\14\1\0\1\16\3\0\1\7\1\15\1\6"+
-    "\1\10\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uff9a\0";
+    "\46\0\1\1\5\0\1\5\1\0\1\6\16\0\1\4\35\0\1\2"+
+    "\1\0\1\3\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffb2\0";
 
   /** 
    * Translates characters to character classes
@@ -49,12 +47,10 @@ class QSLex {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\2\1\1\2\1\3\3\1\1\4\1\5\1\6"+
-    "\1\7\1\10\1\0\4\1\1\11\1\1\1\11\3\1"+
-    "\1\0\1\12\1\13\1\0\1\11";
+    "\1\0\1\1\1\2\1\3\1\4\1\5\1\6\1\7";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[29];
+    int [] result = new int[8];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -79,13 +75,10 @@ class QSLex {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\24\0\50\0\74\0\120\0\144\0\170\0\214"+
-    "\0\120\0\120\0\120\0\120\0\120\0\240\0\264\0\310"+
-    "\0\334\0\360\0\u0104\0\u0118\0\u0118\0\u012c\0\u0140\0\u0154"+
-    "\0\u0168\0\24\0\24\0\u017c\0\u017c";
+    "\0\0\0\7\0\16\0\16\0\16\0\16\0\16\0\16";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[29];
+    int [] result = new int[8];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -108,24 +101,11 @@ class QSLex {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\2\1\3\1\4\1\5\2\2\1\6\3\2\1\7"+
-    "\3\2\1\10\1\11\1\12\1\13\1\14\1\15\3\2"+
-    "\1\0\13\2\5\0\2\2\1\4\1\0\13\2\5\0"+
-    "\2\2\1\4\1\16\1\17\4\2\1\17\5\2\31\0"+
-    "\3\2\1\0\3\2\1\20\7\2\5\0\3\2\1\0"+
-    "\7\2\1\21\3\2\5\0\3\2\1\0\4\2\1\22"+
-    "\6\2\7\0\1\23\21\0\1\2\1\24\1\25\1\0"+
-    "\1\2\1\24\11\2\5\0\3\2\1\0\4\2\1\26"+
-    "\6\2\5\0\3\2\1\0\10\2\1\27\2\2\5\0"+
-    "\3\2\1\0\10\2\1\30\2\2\7\0\1\23\1\0"+
-    "\1\31\4\0\1\31\12\0\2\2\1\25\1\0\13\2"+
-    "\5\0\3\2\1\0\5\2\1\32\5\2\5\0\3\2"+
-    "\1\0\11\2\1\26\1\2\5\0\3\2\1\0\10\2"+
-    "\1\33\2\2\6\0\1\34\1\35\2\0\1\34\20\0"+
-    "\1\35\21\0";
+    "\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\2"+
+    "\15\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[400];
+    int [] result = new int[21];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -163,11 +143,10 @@ class QSLex {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\3\1\1\11\3\1\5\11\1\0\12\1\1\0"+
-    "\2\1\1\0\1\1";
+    "\1\0\1\1\6\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[29];
+    int [] result = new int[8];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -268,7 +247,7 @@ class QSLex {
     char [] map = new char[0x110000];
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
-    while (i < 96) {
+    while (i < 58) {
       int  count = packed.charAt(i++);
       char value = packed.charAt(i++);
       do map[j++] = value; while (--count > 0);
@@ -568,57 +547,37 @@ class QSLex {
             { return new QSToken(QSToken.TYPE_VALUE, yytext());
             } 
             // fall through
-          case 12: break;
+          case 8: break;
           case 2: 
-            { Long val=Long.valueOf(yytext()); return new QSToken(QSToken.TYPE_VALUE, val);
+            { return new QSToken(QSToken.TYPE_AND, null);
+            } 
+            // fall through
+          case 9: break;
+          case 3: 
+            { return new QSToken(QSToken.TYPE_LEFT_SQUARE, null);
+            } 
+            // fall through
+          case 10: break;
+          case 4: 
+            { return new QSToken(QSToken.TYPE_RIGHT_SQUARE, null);
+            } 
+            // fall through
+          case 11: break;
+          case 5: 
+            { return new QSToken(QSToken.TYPE_EQUAL_SIGN, null);
+            } 
+            // fall through
+          case 12: break;
+          case 6: 
+            { return new QSToken(QSToken.TYPE_COMMA, null);
             } 
             // fall through
           case 13: break;
-          case 3: 
+          case 7: 
             { return new QSToken(QSToken.TYPE_DOT, null);
             } 
             // fall through
           case 14: break;
-          case 4: 
-            { return new QSToken(QSToken.TYPE_AND, null);
-            } 
-            // fall through
-          case 15: break;
-          case 5: 
-            { return new QSToken(QSToken.TYPE_LEFT_SQUARE, null);
-            } 
-            // fall through
-          case 16: break;
-          case 6: 
-            { return new QSToken(QSToken.TYPE_RIGHT_SQUARE, null);
-            } 
-            // fall through
-          case 17: break;
-          case 7: 
-            { return new QSToken(QSToken.TYPE_EQUAL_SIGN, null);
-            } 
-            // fall through
-          case 18: break;
-          case 8: 
-            { return new QSToken(QSToken.TYPE_COMMA, null);
-            } 
-            // fall through
-          case 19: break;
-          case 9: 
-            { Double val=Double.valueOf(yytext()); return new QSToken(QSToken.TYPE_VALUE, val);
-            } 
-            // fall through
-          case 20: break;
-          case 10: 
-            { Boolean val=Boolean.valueOf(yytext()); return new QSToken(QSToken.TYPE_VALUE, val);
-            } 
-            // fall through
-          case 21: break;
-          case 11: 
-            { return new QSToken(QSToken.TYPE_VALUE, null);
-            } 
-            // fall through
-          case 22: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

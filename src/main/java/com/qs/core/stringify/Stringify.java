@@ -2,6 +2,7 @@ package com.qs.core.stringify;
 
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
+import com.qs.core.model.StringifyOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,45 +10,45 @@ import java.util.Map;
 
 public class Stringify {
 
-    public static String toQString(QSObject object) {
-        return toQString(object, null);
+    public static String toQString(QSObject object, StringifyOptions options) {
+        return toQString(object, new ArrayList<>(), options);
     }
 
-    private static String toQString(QSObject object, List<String> pathStack) {
+    private static String toQString(QSObject object, List<String> pathStack, StringifyOptions options) {
         if (pathStack == null) pathStack = new ArrayList<>();
         StringBuilder sb = new StringBuilder(33);
         for (Map.Entry<String, Object> entry : object.entrySet()) {
             pathStack.add(entry.getKey());
-            toQString(entry.getValue(), sb, pathStack);
+            toQString(entry.getValue(), sb, pathStack, options);
         }
         if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 
-    private static String toQString(QSArray array, List<String> pathStack) {
+    private static String toQString(QSArray array, List<String> pathStack, StringifyOptions options) {
         if (pathStack == null) pathStack = new ArrayList<>();
         StringBuilder sb = new StringBuilder(33);
         for (int i = 0, size = array.size(); i < size; ++i) {
             pathStack.add(String.valueOf(i));
-            toQString(array.get(i), sb, pathStack);
+            toQString(array.get(i), sb, pathStack, options);
         }
         if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 
-    private static void toQString(Object value, StringBuilder sb, List<String> pathStack) {
+    private static void toQString(Object value, StringBuilder sb, List<String> pathStack, StringifyOptions options) {
         if (value instanceof QSArray) {
-            sb.append(toQString((QSArray) value, pathStack));
+            sb.append(toQString((QSArray) value, pathStack, options));
         } else if (value instanceof QSObject) {
-            sb.append(toQString((QSObject) value, pathStack));
+            sb.append(toQString((QSObject) value, pathStack, options));
         } else {
-            sb.append(toPathString(pathStack)).append('=').append(value);
+            sb.append(toPathString(pathStack, options)).append('=').append(value);
         }
         pathStack.remove(pathStack.size() - 1);
-        sb.append('&');
+        sb.append(options.getDelimiter());
     }
 
-    private static String toPathString(List<String> pathStack) {
+    private static String toPathString(List<String> pathStack, StringifyOptions options) {
         StringBuilder sb = new StringBuilder(33);
         for (int i = 0, size = pathStack.size(); i < size; ++i) {
             if (i == 0) {

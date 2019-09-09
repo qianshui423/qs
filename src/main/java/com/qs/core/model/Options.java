@@ -11,16 +11,14 @@ class Options {
     // 字符集(暂时只支持utf-8字符)
     public static final String CHARSET = Charset.UTF8.getCharset();
 
-    private String delimiter;
+    private String delimiter = DELIMITER;
+    private String charset = CHARSET;
     private boolean allowDots;
     private boolean strictNullHandling;
-    private String charset;
 
-    public Options(String delimiter, boolean allowDots, boolean strictNullHandling, String charset) {
-        this.delimiter = delimiter;
+    public Options(boolean allowDots, boolean strictNullHandling) {
         this.allowDots = allowDots;
         this.strictNullHandling = strictNullHandling;
-        this.charset = charset;
     }
 
     public String getDelimiter() {
@@ -40,15 +38,8 @@ class Options {
     }
 
     public static class Builder {
-        private String delimiter = DELIMITER;
         private boolean allowDots = ALLOW_DOTS;
         private boolean strictNullHandling = STRICT_NULL_HANDLING;
-        private String charset = CHARSET;
-
-        public Builder setDelimiter(String delimiter) {
-            this.delimiter = delimiter;
-            return this;
-        }
 
         public Builder setAllowDots(boolean allowDots) {
             this.allowDots = allowDots;
@@ -61,7 +52,7 @@ class Options {
         }
 
         public Options build() {
-            return new Options(delimiter, allowDots, strictNullHandling, charset);
+            return new Options(allowDots, strictNullHandling);
         }
     }
 

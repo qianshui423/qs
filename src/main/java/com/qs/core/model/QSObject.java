@@ -27,7 +27,7 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
 
     @Override
     public String toQString(StringifyOptions options) {
-        return Stringify.toQString(this);
+        return Stringify.toQString(this, options);
     }
 
     @Override
