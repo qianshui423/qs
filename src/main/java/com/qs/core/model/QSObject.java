@@ -22,7 +22,22 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
 
     @Override
     public String toQString() {
+        return toQString(new StringifyOptions.Builder().build());
+    }
+
+    @Override
+    public String toQString(StringifyOptions options) {
         return Stringify.toQString(this);
+    }
+
+    @Override
+    public void writeQString(Writer out) throws IOException {
+        writeQString(out, new StringifyOptions.Builder().build());
+    }
+
+    @Override
+    public void writeQString(Writer out, StringifyOptions options) throws IOException {
+        out.write(toQString(options));
     }
 
     @Override
@@ -33,10 +48,5 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
     @Override
     public String toString() {
         return QSFormatter.format(this);
-    }
-
-    @Override
-    public void writeQString(Writer out) throws IOException {
-        out.write(toQString());
     }
 }

@@ -2,8 +2,6 @@ package com.qs.core.model;
 
 class Options {
 
-    // 最大解析深度
-    public static final int DEPTH = 5;
     // 参数定界符
     public static final String DELIMITER = "&";
     // 不允许.为定界符
@@ -13,22 +11,16 @@ class Options {
     // 字符集(暂时只支持utf-8字符)
     public static final String CHARSET = Charset.UTF8.getCharset();
 
-    private int depth;
     private String delimiter;
     private boolean allowDots;
     private boolean strictNullHandling;
     private String charset;
 
-    public Options(int depth, String delimiter, boolean allowDots, boolean strictNullHandling, String charset) {
-        this.depth = depth;
+    public Options(String delimiter, boolean allowDots, boolean strictNullHandling, String charset) {
         this.delimiter = delimiter;
         this.allowDots = allowDots;
         this.strictNullHandling = strictNullHandling;
         this.charset = charset;
-    }
-
-    public int getDepth() {
-        return depth;
     }
 
     public String getDelimiter() {
@@ -48,16 +40,10 @@ class Options {
     }
 
     public static class Builder {
-        private int depth = DEPTH;
         private String delimiter = DELIMITER;
         private boolean allowDots = ALLOW_DOTS;
         private boolean strictNullHandling = STRICT_NULL_HANDLING;
         private String charset = CHARSET;
-
-        public Builder setDepth(int depth) {
-            this.depth = depth;
-            return this;
-        }
 
         public Builder setDelimiter(String delimiter) {
             this.delimiter = delimiter;
@@ -75,7 +61,7 @@ class Options {
         }
 
         public Options build() {
-            return new Options(depth, delimiter, allowDots, strictNullHandling, charset);
+            return new Options(delimiter, allowDots, strictNullHandling, charset);
         }
     }
 

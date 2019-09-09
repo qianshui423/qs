@@ -1,6 +1,7 @@
 package com.qs.core;
 
 import com.qs.core.log.Logger;
+import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSObject;
 import com.qs.core.parser.ParseException;
 import com.qs.core.parser.QSParser;
@@ -16,8 +17,9 @@ public class QSExample {
         String queryString3 = "d[][]=14&d[][]=fa&d[1][]=1"; // 仅用作测试，实际不建议这么使用，不够清晰
         String queryString4 = "a.0.c.d=1&a.0.c.d=2&a.b.c.f.0=3&&a.b.c.f.g=4"; // a.0.c.d=1&a.0.c.d=2&a.b.c.f=3
         String queryString5 = "c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=null"; // c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=2
+        String queryString6 = "a.b.c.d.e.f.g.h.i=0";
         try {
-            QSObject qsObject = new QSParser().parse(queryString4);
+            QSObject qsObject = new QSParser().parse(queryString6, new ParseOptions.Builder().setDepth(10).build());
             System.out.println(qsObject);
             String qsString = qsObject.toQString();
             System.out.println(qsString);

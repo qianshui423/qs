@@ -22,10 +22,10 @@ public class StringifyOptions extends Options {
     private boolean addQueryPrefix;
     private boolean skipNulls;
 
-    public StringifyOptions(int depth, String delimiter, boolean allowDots, boolean strictNullHandling,
+    public StringifyOptions(String delimiter, boolean allowDots, boolean strictNullHandling,
                             String charset, boolean encode, boolean encodeValuesOnly, boolean indices,
                             String arrayFormat, boolean addQueryPrefix, boolean skipNulls) {
-        super(depth, delimiter, allowDots, strictNullHandling, charset);
+        super(delimiter, allowDots, strictNullHandling, charset);
         this.encode = encode;
         this.encodeValuesOnly = encodeValuesOnly;
         this.indices = indices;
@@ -96,11 +96,6 @@ public class StringifyOptions extends Options {
             return this;
         }
 
-        public Builder setDepth(int depth) {
-            super.setDepth(depth);
-            return this;
-        }
-
         public Builder setDelimiter(String delimiter) {
             super.setDelimiter(delimiter);
             return this;
@@ -118,7 +113,7 @@ public class StringifyOptions extends Options {
 
         public StringifyOptions build() {
             Options options = super.build();
-            return new StringifyOptions(options.getDepth(), options.getDelimiter(), options.isAllowDots(),
+            return new StringifyOptions(options.getDelimiter(), options.isAllowDots(),
                     options.isStrictNullHandling(), options.getCharset(),
                     encode, encodeValuesOnly, indices, arrayFormat, addQueryPrefix, skipNulls);
         }

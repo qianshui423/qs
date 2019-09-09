@@ -22,6 +22,8 @@ public class ParserHandler {
 
     private ArrayFormat mArrayFormat = ArrayFormat.INDICES;
 
+    private ParseOptions mOptions;
+
     void switchMode(ArrayFormat format) {
         mArrayFormat = format;
     }
@@ -31,6 +33,7 @@ public class ParserHandler {
     }
 
     void pairKeyStart(ParseOptions options, QSToken token) {
+        mOptions = options;
         offerPath(token.value);
     }
 
@@ -38,7 +41,23 @@ public class ParserHandler {
         if (isCommaMode() && mValueList.size() == 1) {
             mPathQueue.pollLast();
         }
+        handleDepth();
         put(position, mQSObject, mPathQueue, mValueList);
+    }
+
+    private void handleDepth() {
+        int pathSize = mPathQueue.size();
+        int optionDepth = mOptions.getDepth();
+        int pathChildDepth = pathSize == 0 ? 0 : pathSize - 1;
+        int dValue = pathChildDepth - optionDepth;
+        if (dValue > 0) {
+            StringBuilder mergePath = new StringBuilder();
+            for (int i = 0; i < dValue; i++) {
+                Object value = mPathQueue.remove(pathSize - dValue);
+                mergePath.append("[").append(value).append("]");
+            }
+            mPathQueue.offer(mergePath);
+        }
     }
 
     public QSObject getQSObject() {
