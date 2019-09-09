@@ -27,10 +27,10 @@ AND = &
 <YYINITIAL> {
           {UNESCAPED_CH}+	{ return new QSToken(QSToken.TYPE_VALUE, yytext()); }
 }
-<YYINITIAL> {LEFT_SQUARE} 	{ return new QSToken(QSToken.TYPE_LEFT_SQUARE, null); }
-<YYINITIAL> {RIGHT_SQUARE} 	{ return new QSToken(QSToken.TYPE_RIGHT_SQUARE, null); }
-<YYINITIAL> {EQUAL_SIGN}    { return new QSToken(QSToken.TYPE_EQUAL_SIGN, null); }
-<YYINITIAL> {COMMA}			{ return new QSToken(QSToken.TYPE_COMMA, null); }
-<YYINITIAL> {DOT}			{ return new QSToken(QSToken.TYPE_DOT, null); }
-<YYINITIAL> {AND}	 		{ return new QSToken(QSToken.TYPE_AND, null); }
+<YYINITIAL> {LEFT_SQUARE} 	{ return new QSToken(QSToken.TYPE_LEFT_SQUARE, yytext()); }
+<YYINITIAL> {RIGHT_SQUARE} 	{ return new QSToken(QSToken.TYPE_RIGHT_SQUARE, yytext()); }
+<YYINITIAL> {EQUAL_SIGN}    { return new QSToken(QSToken.TYPE_EQUAL_SIGN, yytext()); }
+<YYINITIAL> {COMMA}			{ return new QSToken(QSToken.TYPE_COMMA, yytext()); }
+<YYINITIAL> {DOT}			{ return new QSToken(QSToken.TYPE_DOT, yytext()); }
+<YYINITIAL> {AND}	 		{ return new QSToken(QSToken.TYPE_AND, yytext()); }
 

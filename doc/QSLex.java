@@ -549,32 +549,32 @@ class QSLex {
             // fall through
           case 8: break;
           case 2: 
-            { return new QSToken(QSToken.TYPE_AND, null);
+            { return new QSToken(QSToken.TYPE_AND, yytext());
             } 
             // fall through
           case 9: break;
           case 3: 
-            { return new QSToken(QSToken.TYPE_LEFT_SQUARE, null);
+            { return new QSToken(QSToken.TYPE_LEFT_SQUARE, yytext());
             } 
             // fall through
           case 10: break;
           case 4: 
-            { return new QSToken(QSToken.TYPE_RIGHT_SQUARE, null);
+            { return new QSToken(QSToken.TYPE_RIGHT_SQUARE, yytext());
             } 
             // fall through
           case 11: break;
           case 5: 
-            { return new QSToken(QSToken.TYPE_EQUAL_SIGN, null);
+            { return new QSToken(QSToken.TYPE_EQUAL_SIGN, yytext());
             } 
             // fall through
           case 12: break;
           case 6: 
-            { return new QSToken(QSToken.TYPE_COMMA, null);
+            { return new QSToken(QSToken.TYPE_COMMA, yytext());
             } 
             // fall through
           case 13: break;
           case 7: 
-            { return new QSToken(QSToken.TYPE_DOT, null);
+            { return new QSToken(QSToken.TYPE_DOT, yytext());
             } 
             // fall through
           case 14: break;

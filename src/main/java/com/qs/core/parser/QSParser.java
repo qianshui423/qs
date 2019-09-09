@@ -167,6 +167,9 @@ public class QSParser {
                         }
                         case QSToken.TYPE_DOT: {
                             mStatus = S_IN_FINISHED_DOT;
+                            if (!options.isAllowDots()) {
+                                mParserHandler.appendLastPath(mToken.value);
+                            }
                             break;
                         }
                         default: {
@@ -189,7 +192,11 @@ public class QSParser {
                     switch (mToken.type) {
                         case QSToken.TYPE_VALUE: {
                             mStatus = S_IN_FINISHED_VALUE;
-                            mParserHandler.offerPath(mToken.value);
+                            if (options.isAllowDots()) {
+                                mParserHandler.offerPath(mToken.value);
+                            } else {
+                                mParserHandler.appendLastPath(mToken.value);
+                            }
                             break;
                         }
                         case QSToken.TYPE_EQUAL_SIGN: {
