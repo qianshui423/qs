@@ -42,7 +42,14 @@ public class Stringify {
         } else if (value instanceof QSObject) {
             sb.append(toQString((QSObject) value, pathStack, options));
         } else {
-            sb.append(toPathString(pathStack, options)).append('=').append(value);
+            sb.append(toPathString(pathStack, options));
+            if (value != null) {
+                sb.append('=').append(value);
+            } else {
+                if (!options.isStrictNullHandling()) {
+                    sb.append('=');
+                }
+            }
         }
         pathStack.remove(pathStack.size() - 1);
         sb.append(options.getDelimiter());

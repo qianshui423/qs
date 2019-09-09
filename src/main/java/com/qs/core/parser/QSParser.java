@@ -19,6 +19,8 @@ public class QSParser {
     public static final int S_IN_FINISHED_DOT = 6;
     public static final int S_IN_ERROR = -1;
 
+    public static final String EMPTY_STRING = "";
+
     private QSLex mLexer = new QSLex(null);
     private QSToken mToken = null;
     private int mStatus = S_INIT;
@@ -126,6 +128,7 @@ public class QSParser {
                             if (mParserHandler.isCommaMode()) {
                                 mParserHandler.switchMode(ArrayFormat.REPEAT);
                             }
+                            mParserHandler.offerValue(EMPTY_STRING);
                             mParserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
@@ -157,6 +160,9 @@ public class QSParser {
                             mStatus = S_INIT;
                             if (mParserHandler.isCommaMode()) {
                                 mParserHandler.switchMode(ArrayFormat.REPEAT);
+                            }
+                            if (!options.isStrictNullHandling()) {
+                                mParserHandler.offerValue(EMPTY_STRING);
                             }
                             mParserHandler.pairValueEnd(mLexer.getPosition());
                             break;
