@@ -1,5 +1,7 @@
 package com.qs.core.model;
 
+import java.util.Objects;
+
 public class Pair<K, V> {
     public final K key;
     public final V value;
@@ -19,7 +21,7 @@ public class Pair<K, V> {
     }
 
     private boolean equalsObject(Object a, Object b) {
-        return (a == b) || (a != null && a.equals(b));
+        return Objects.equals(a, b);
     }
 
     @Override
@@ -29,7 +31,7 @@ public class Pair<K, V> {
 
     @Override
     public String toString() {
-        return "Query{" + key + " " + value + "}";
+        return "Pair{" + key + " " + value + "}";
     }
 
     public static <K, V> Pair<K, V> create(K key, V value) {
