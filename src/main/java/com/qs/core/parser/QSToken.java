@@ -1,7 +1,7 @@
 package com.qs.core.parser;
 
 public class QSToken {
-    public static final int TYPE_VALUE = 1; // QSExample primitive value: string, number, boolean, null
+    public static final int TYPE_VALUE = 1; // QSExample primitive value: string
     public static final int TYPE_LEFT_SQUARE = 3; // [
     public static final int TYPE_RIGHT_SQUARE = 4; // ]
     public static final int TYPE_EQUAL_SIGN = 2; // =
@@ -11,9 +11,9 @@ public class QSToken {
     public static final int TYPE_EOF = -1; // end of file
 
     public int type;
-    public Object value;
+    public String value;
 
-    public QSToken(int type, Object value) {
+    public QSToken(int type, String value) {
         this.type = type;
         this.value = value;
     }

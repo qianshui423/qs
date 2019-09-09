@@ -14,10 +14,10 @@ public class ParserHandler {
     /**
      * 处理解析 {@link ArrayFormat#BRACKETS} 格式数组
      */
-    public static final int BRACKETS_NO_INDEX = -1000;
+    public static final String BRACKETS_EMPTY_INDEX = "EMPTY_INDEX";
 
     private QSObject mQSObject = newObject();
-    private LinkedList<Object> mPathQueue = new LinkedList<>();
+    private LinkedList<String> mPathQueue = new LinkedList<>();
     private QSArray mValueList = newArray();
 
     private ArrayFormat mArrayFormat = ArrayFormat.INDICES;
@@ -56,7 +56,7 @@ public class ParserHandler {
                 Object value = mPathQueue.remove(pathSize - dValue);
                 mergePath.append("[").append(value).append("]");
             }
-            mPathQueue.offer(mergePath);
+            mPathQueue.offer(mergePath.toString());
         }
     }
 
@@ -70,7 +70,7 @@ public class ParserHandler {
         mValueList = newArray();
     }
 
-    public void offerPath(Object path) {
+    public void offerPath(String path) {
         mPathQueue.offer(path);
     }
 
@@ -78,14 +78,14 @@ public class ParserHandler {
         mValueList.add(value);
     }
 
-    private void put(int position, @Nonnull QSObject qsObject, LinkedList<Object> pathQueue, QSArray valueList) throws ParseException {
+    private void put(int position, @Nonnull QSObject qsObject, LinkedList<String> pathQueue, QSArray valueList) throws ParseException {
         Object parent = null; // current 对象在父节点
         Object parentPath = null; // current 对象在父节点中的 key
         Object current = qsObject;
-        Object child = null;
+        Object child;
         int length = pathQueue.size();
         for (int i = 0; i < length - 1; i++) {
-            Object path = pathQueue.get(i);
+            String path = pathQueue.get(i);
             if (current instanceof QSObject) {
                 QSObject object = (QSObject) current;
                 String pathString = String.valueOf(path);
@@ -95,8 +95,8 @@ public class ParserHandler {
             } else {
                 if (isArrayIndex(path)) {
                     QSArray array = (QSArray) current;
-                    int pathIndex = Integer.valueOf(String.valueOf(path));
-                    if (isBracketsNoIndex(pathIndex) || pathIndex == array.size()) {
+                    int pathIndex = Integer.valueOf(path);
+                    if (isBracketsEmptyIndex(path) || pathIndex == array.size()) {
                         child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
                         array.add(child);
                     } else if (pathIndex < array.size()) {
@@ -117,7 +117,7 @@ public class ParserHandler {
             current = child;
         }
 
-        Object lastPath = pathQueue.peekLast();
+        String lastPath = pathQueue.peekLast();
         if (current instanceof QSObject) {
             QSObject object = (QSObject) current;
             String pathString = String.valueOf(lastPath);
@@ -143,9 +143,9 @@ public class ParserHandler {
         } else {
             if (isArrayIndex(lastPath)) {
                 QSArray array = (QSArray) current;
-                int pathIndex = Integer.valueOf(String.valueOf(lastPath));
+                int pathIndex = Integer.valueOf(lastPath);
                 Object value = processValue(valueList);
-                if (isBracketsNoIndex(pathIndex) || pathIndex == array.size()) {
+                if (isBracketsEmptyIndex(lastPath) || pathIndex == array.size()) {
                     array.add(value);
                 } else if (pathIndex < array.size()) {
                     Object existObject = array.get(pathIndex);
@@ -215,25 +215,20 @@ public class ParserHandler {
         return new QSObject();
     }
 
-    private boolean isArrayIndex(Object value) {
-        return isNaturalNumber(value) || isBracketsNoIndex(value);
+    private boolean isArrayIndex(String value) {
+        return isNaturalNumber(value) || isBracketsEmptyIndex(value);
     }
 
-    private boolean isNaturalNumber(Object value) {
+    private boolean isNaturalNumber(String value) {
         try {
-            int number = Integer.valueOf(String.valueOf(value));
+            int number = Integer.valueOf(value);
             return number >= 0;
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    private boolean isBracketsNoIndex(Object value) {
-        try {
-            int number = Integer.valueOf(String.valueOf(value));
-            return number == BRACKETS_NO_INDEX;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    private boolean isBracketsEmptyIndex(String value) {
+        return BRACKETS_EMPTY_INDEX.equals(value);
     }
 }

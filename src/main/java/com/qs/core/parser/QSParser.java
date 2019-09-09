@@ -85,7 +85,7 @@ public class QSParser {
                         }
                         case QSToken.TYPE_RIGHT_SQUARE: {
                             mStatus = S_IN_FINISHED_RIGHT_SQUARE;
-                            mParserHandler.offerPath(ParserHandler.BRACKETS_NO_INDEX);
+                            mParserHandler.offerPath(ParserHandler.BRACKETS_EMPTY_INDEX);
                             mParserHandler.switchMode(ArrayFormat.BRACKETS);
                             break;
                         }

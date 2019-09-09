@@ -16,7 +16,7 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
         super();
     }
 
-    public QSObject(Map<String, Object> map) {
+    public QSObject(Map<String, String> map) {
         super(map);
     }
 

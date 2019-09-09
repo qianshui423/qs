@@ -4,9 +4,9 @@ class Options {
 
     // 参数定界符
     public static final String DELIMITER = "&";
-    // 不允许.为定界符
+    // 不允许 . 为 path 定界符
     public static final boolean ALLOW_DOTS = false;
-    // 是否区分value为null
+    // 是否区分 value 为 null
     public static final boolean STRICT_NULL_HANDLING = false;
     // 字符集(暂时只支持utf-8字符)
     public static final String CHARSET = Charset.UTF8.getCharset();
