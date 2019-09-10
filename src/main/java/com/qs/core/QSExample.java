@@ -7,6 +7,8 @@ import com.qs.core.model.StringifyOptions;
 import com.qs.core.parser.ParseException;
 import com.qs.core.parser.QSParser;
 
+import java.util.Arrays;
+
 public class QSExample {
 
     public static void main(String[] args) {
@@ -20,10 +22,14 @@ public class QSExample {
         String queryString5 = "c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=null"; // c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=2
         String queryString6 = "?a.?b.c.d.e.f.g.h.i";
         String queryString7 = "a[]=b";
+        String queryString8 = "a.b=b.c";
+        String queryString9 = "...a...b...=,,a,,b,,";
+        System.out.println(Arrays.asList(queryString9.split(",")));
         try {
-            QSObject qsObject = new QSParser().parse(queryString7,
+            QSObject qsObject = new QSParser().parse(queryString9,
                     new ParseOptions.Builder()
                             .setDepth(10)
+                            .setComma(true)
                             .setAllowDots(true)
                             .setStrictNullHandling(true)
                             .setIgnoreQueryPrefix(true)

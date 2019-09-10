@@ -2,12 +2,10 @@ package com.qs.core.parser;
 
 public class QSToken {
     public static final int TYPE_VALUE = 1; // QSExample primitive value: string
-    public static final int TYPE_LEFT_SQUARE = 3; // [
-    public static final int TYPE_RIGHT_SQUARE = 4; // ]
-    public static final int TYPE_EQUAL_SIGN = 2; // =
-    public static final int TYPE_COMMA = 5; // ,
-    public static final int TYPE_DOT = 6; // .
-    public static final int TYPE_AND = 7; // &
+    public static final int TYPE_LEFT_SQUARE = 2; // [
+    public static final int TYPE_RIGHT_SQUARE = 3; // ]
+    public static final int TYPE_EQUAL_SIGN = 4; // =
+    public static final int TYPE_AND = 5; // &
     public static final int TYPE_EOF = -1; // end of file
 
     public int type;
@@ -32,12 +30,6 @@ public class QSToken {
                 break;
             case TYPE_EQUAL_SIGN:
                 sb.append("EQUAL SIGN(=)");
-                break;
-            case TYPE_COMMA:
-                sb.append("COMMA(,)");
-                break;
-            case TYPE_DOT:
-                sb.append("DOT(.)");
                 break;
             case TYPE_AND:
                 sb.append("AND(&)");

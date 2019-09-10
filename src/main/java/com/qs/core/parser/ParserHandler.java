@@ -6,6 +6,7 @@ import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,12 +16,15 @@ public class ParserHandler {
      * 处理解析 {@link ArrayFormat#BRACKETS} 格式数组
      */
     public static final String BRACKETS_EMPTY_INDEX = "-1";
+    public static final String CHAR_DOT = ".";
+    public static final String REGEX_FIRST_DOT = "^\\.+";
+    public static final String REGEX_DOT = "\\.+";
+    public static final String CHAR_COMMA = ",";
+    public static final String REGEX_COMMA = ",";
 
     private QSObject mQSObject = newObject();
     private LinkedList<String> mPathQueue = new LinkedList<>();
     private QSArray mValueList = newArray();
-
-    private ArrayFormat mArrayFormat = ArrayFormat.INDICES;
 
     private ParseOptions mOptions;
 
@@ -30,23 +34,12 @@ public class ParserHandler {
         this.mOptions = mOptions;
     }
 
-    void switchMode(ArrayFormat format) {
-        mArrayFormat = format;
-    }
-
-    boolean isCommaMode() {
-        return mArrayFormat == ArrayFormat.COMMA;
-    }
-
     void pairKeyStart(QSToken token) {
         offerPath(token.value);
         mParameterCount++;
     }
 
     void pairValueEnd(int position) throws ParseException {
-        if (isCommaMode() && mValueList.size() == 1) {
-            mPathQueue.pollLast();
-        }
         handleDepth();
         put(position, mQSObject, mPathQueue, mValueList);
     }
@@ -74,24 +67,33 @@ public class ParserHandler {
         return mQSObject;
     }
 
-    void reset() {
-        mQSObject = newObject();
-        mPathQueue = new LinkedList<>();
-        mValueList = newArray();
-        mParameterCount = 0;
-    }
-
     public void offerPath(String path) {
-        mPathQueue.offer(path);
+        if (mOptions.isAllowDots() && path.length() > 1) { // 不允许 . 分割或者 path 为 1 时，则直接加入到 queue 中
+            int indexDot = path.indexOf(CHAR_DOT);
+            if (indexDot == -1) {
+                mPathQueue.offer(path);
+            } else {
+                path = path.replaceAll(REGEX_FIRST_DOT, "");
+                String[] paths = path.split(REGEX_DOT);
+                mPathQueue.addAll(Arrays.asList(paths));
+            }
+        } else {
+            mPathQueue.offer(path);
+        }
     }
 
-    public void appendLastPath(String appendPath) {
-        String lastPath = mPathQueue.pollLast();
-        mPathQueue.offer((lastPath == null ? "" : lastPath) + appendPath);
-    }
-
-    public void offerValue(Object value) {
-        mValueList.add(value);
+    public void offerValue(String value) {
+        if (mOptions.isComma() && !value.isEmpty()) {
+            int indexComma = value.indexOf(CHAR_COMMA);
+            if (indexComma == -1) {
+                mValueList.add(value);
+            } else {
+                String[] values = value.split(REGEX_COMMA, -1);
+                mValueList.addAll(Arrays.asList(values));
+            }
+        } else {
+            mValueList.add(value);
+        }
     }
 
     private void put(int position, @Nonnull QSObject qsObject, LinkedList<String> pathQueue, QSArray valueList) throws ParseException {
@@ -104,7 +106,7 @@ public class ParserHandler {
             String path = pathQueue.get(i);
             if (current instanceof QSObject) {
                 QSObject object = (QSObject) current;
-                String wrapPath =  wrapPathValue(String.valueOf(path));
+                String wrapPath = wrapPathValue(String.valueOf(path));
                 child = object.get(wrapPath);
                 if (child == null) child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
                 object.put(wrapPath, child);
