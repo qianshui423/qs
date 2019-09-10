@@ -19,8 +19,9 @@ public class QSExample {
         String queryString4 = "a.0.c.d=1&a.0.c.d=2&a.b.c.f.0=3&&a.b.c.f.g=4"; // a.0.c.d=1&a.0.c.d=2&a.b.c.f=3
         String queryString5 = "c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=null"; // c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=2
         String queryString6 = "?a.?b.c.d.e.f.g.h.i";
+        String queryString7 = "a[]=b";
         try {
-            QSObject qsObject = new QSParser().parse(queryString6,
+            QSObject qsObject = new QSParser().parse(queryString7,
                     new ParseOptions.Builder()
                             .setDepth(10)
                             .setAllowDots(true)

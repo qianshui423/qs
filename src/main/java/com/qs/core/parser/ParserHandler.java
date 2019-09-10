@@ -14,7 +14,7 @@ public class ParserHandler {
     /**
      * 处理解析 {@link ArrayFormat#BRACKETS} 格式数组
      */
-    public static final String BRACKETS_EMPTY_INDEX = "EMPTY_INDEX";
+    public static final String BRACKETS_EMPTY_INDEX = "-1";
 
     private QSObject mQSObject = newObject();
     private LinkedList<String> mPathQueue = new LinkedList<>();
@@ -245,6 +245,11 @@ public class ParserHandler {
     }
 
     private boolean isBracketsEmptyIndex(String value) {
-        return BRACKETS_EMPTY_INDEX.equals(value);
+        try {
+            int number = Integer.valueOf(value);
+            return number == Integer.valueOf(BRACKETS_EMPTY_INDEX);
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
