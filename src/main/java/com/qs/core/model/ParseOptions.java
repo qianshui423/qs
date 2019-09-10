@@ -8,7 +8,8 @@ public class ParseOptions extends Options {
     public static final int PARAMETER_LIMIT = 1000;
     // 是否忽略&前缀
     public static final boolean IGNORE_QUERY_PREFIX = false;
-    // 数组索引的最大值，超过则会解析成对象形式
+    // indices 模式下，数组索引的最大值，超过则会解析成对象形式
+    // （由于在数组实现机制与 js qs 库不同，只允许一个接一个添加，所以不会存在冗余数据的遍历）
     public static final int ARRAY_LIMIT = 20;
     // []是否以数组形式解析
     public static final boolean PARSE_ARRAYS = true;
@@ -22,9 +23,9 @@ public class ParseOptions extends Options {
     private boolean parseArrays;
     private boolean comma;
 
-    public ParseOptions(boolean allowDots, boolean strictNullHandling,
-                        int depth, int parameterLimit, boolean ignoreQueryPrefix, int arrayLimit,
-                        boolean parseArrays, boolean comma) {
+    private ParseOptions(boolean allowDots, boolean strictNullHandling,
+                         int depth, int parameterLimit, boolean ignoreQueryPrefix, int arrayLimit,
+                         boolean parseArrays, boolean comma) {
         super(allowDots, strictNullHandling);
         this.depth = depth;
         this.parameterLimit = parameterLimit;
@@ -78,11 +79,6 @@ public class ParseOptions extends Options {
 
         public Builder setIgnoreQueryPrefix(boolean ignoreQueryPrefix) {
             this.ignoreQueryPrefix = ignoreQueryPrefix;
-            return this;
-        }
-
-        public Builder setArrayLimit(int arrayLimit) {
-            this.arrayLimit = arrayLimit;
             return this;
         }
 

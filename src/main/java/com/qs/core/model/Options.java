@@ -16,7 +16,7 @@ class Options {
     private boolean allowDots;
     private boolean strictNullHandling;
 
-    public Options(boolean allowDots, boolean strictNullHandling) {
+    Options(boolean allowDots, boolean strictNullHandling) {
         this.allowDots = allowDots;
         this.strictNullHandling = strictNullHandling;
     }

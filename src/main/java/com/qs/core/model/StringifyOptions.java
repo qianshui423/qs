@@ -22,7 +22,7 @@ public class StringifyOptions extends Options {
     private boolean addQueryPrefix;
     private boolean skipNulls;
 
-    public StringifyOptions(boolean allowDots, boolean strictNullHandling,
+    private StringifyOptions(boolean allowDots, boolean strictNullHandling,
                             boolean encode, boolean encodeValuesOnly, boolean indices,
                             String arrayFormat, boolean addQueryPrefix, boolean skipNulls) {
         super(allowDots, strictNullHandling);
