@@ -9,7 +9,7 @@ public class ParseOptions extends Options {
     // 是否忽略&前缀
     public static final boolean IGNORE_QUERY_PREFIX = false;
     // indices 模式下，数组索引的最大值，超过则会解析成对象形式
-    // （由于在数组实现机制与 js qs 库不同，只允许一个接一个添加，所以不会存在冗余数据的遍历）
+    // 不支持配置（由于在数组实现机制与 js qs 库不同，只允许一个接一个添加，所以不会存在冗余数据的遍历）
     public static final int ARRAY_LIMIT = 20;
     // []是否以数组形式解析
     public static final boolean PARSE_ARRAYS = true;
