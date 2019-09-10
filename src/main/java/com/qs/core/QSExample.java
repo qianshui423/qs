@@ -20,7 +20,12 @@ public class QSExample {
         String queryString5 = "c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=null"; // c1[0][0]=0&c1[0][1]=1&c1[0][2]=2&c1[1][0]=2
         String queryString6 = "a.b.c.d.e.f.g.h.i";
         try {
-            QSObject qsObject = new QSParser().parse(queryString6, new ParseOptions.Builder().setDepth(10).setAllowDots(true).setStrictNullHandling(true).build());
+            QSObject qsObject = new QSParser().parse(queryString6,
+                    new ParseOptions.Builder()
+                            .setDepth(10)
+                            .setAllowDots(true)
+                            .setStrictNullHandling(true)
+                            .build());
             System.out.println(qsObject);
             String qsString = qsObject.toQString(new StringifyOptions.Builder().setStrictNullHandling(false).build());
             System.out.println(qsString);

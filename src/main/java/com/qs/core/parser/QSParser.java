@@ -25,8 +25,6 @@ public class QSParser {
     private QSToken mToken = null;
     private int mStatus = S_INIT;
 
-    private ParserHandler mParserHandler = new ParserHandler();
-
     public void reset() {
         mToken = null;
         mStatus = S_INIT;
@@ -56,6 +54,7 @@ public class QSParser {
 
     public QSObject parse(Reader in, ParseOptions options) throws IOException, ParseException {
         reset(in);
+        ParserHandler parserHandler = new ParserHandler(options);
         do {
             nextToken();
             switch (mStatus) {
@@ -67,7 +66,11 @@ public class QSParser {
                         }
                         case QSToken.TYPE_VALUE: {
                             mStatus = S_IN_FINISHED_VALUE;
-                            mParserHandler.pairKeyStart(options, mToken);
+                            if (parserHandler.isUpperLimit()) {
+                                mToken = new QSToken(QSToken.TYPE_EOF, null);
+                            } else {
+                                parserHandler.pairKeyStart(mToken);
+                            }
                             break;
                         }
                         default: {
@@ -81,14 +84,14 @@ public class QSParser {
                     switch (mToken.type) {
                         case QSToken.TYPE_VALUE: {
                             mStatus = S_IN_FINISHED_VALUE;
-                            mParserHandler.offerPath(mToken.value);
-                            mParserHandler.switchMode(ArrayFormat.INDICES);
+                            parserHandler.offerPath(mToken.value);
+                            parserHandler.switchMode(ArrayFormat.INDICES);
                             break;
                         }
                         case QSToken.TYPE_RIGHT_SQUARE: {
                             mStatus = S_IN_FINISHED_RIGHT_SQUARE;
-                            mParserHandler.offerPath(ParserHandler.BRACKETS_EMPTY_INDEX);
-                            mParserHandler.switchMode(ArrayFormat.BRACKETS);
+                            parserHandler.offerPath(ParserHandler.BRACKETS_EMPTY_INDEX);
+                            parserHandler.switchMode(ArrayFormat.BRACKETS);
                             break;
                         }
                         default: {
@@ -119,17 +122,17 @@ public class QSParser {
                     switch (mToken.type) {
                         case QSToken.TYPE_VALUE: {
                             mStatus = S_IN_FINISHED_VALUE;
-                            mParserHandler.offerValue(mToken.value);
+                            parserHandler.offerValue(mToken.value);
                             break;
                         }
                         case QSToken.TYPE_AND:
                         case QSToken.TYPE_EOF: {
                             mStatus = S_INIT;
-                            if (mParserHandler.isCommaMode()) {
-                                mParserHandler.switchMode(ArrayFormat.REPEAT);
+                            if (parserHandler.isCommaMode()) {
+                                parserHandler.switchMode(ArrayFormat.REPEAT);
                             }
-                            mParserHandler.offerValue(EMPTY_STRING);
-                            mParserHandler.pairValueEnd(mLexer.getPosition());
+                            parserHandler.offerValue(EMPTY_STRING);
+                            parserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
                         default: {
@@ -143,7 +146,7 @@ public class QSParser {
                     switch (mToken.type) {
                         case QSToken.TYPE_LEFT_SQUARE: {
                             mStatus = S_IN_FINISHED_LEFT_SQUARE;
-                            mParserHandler.switchMode(ArrayFormat.INDICES);
+                            parserHandler.switchMode(ArrayFormat.INDICES);
                             break;
                         }
                         case QSToken.TYPE_RIGHT_SQUARE: {
@@ -152,19 +155,19 @@ public class QSParser {
                         }
                         case QSToken.TYPE_EQUAL_SIGN: {
                             mStatus = S_IN_FINISHED_EQUAL_SIGN;
-                            mParserHandler.switchMode(ArrayFormat.COMMA);
+                            parserHandler.switchMode(ArrayFormat.COMMA);
                             break;
                         }
                         case QSToken.TYPE_AND:
                         case QSToken.TYPE_EOF: {
                             mStatus = S_INIT;
-                            if (mParserHandler.isCommaMode()) {
-                                mParserHandler.switchMode(ArrayFormat.REPEAT);
+                            if (parserHandler.isCommaMode()) {
+                                parserHandler.switchMode(ArrayFormat.REPEAT);
                             }
                             if (!options.isStrictNullHandling()) {
-                                mParserHandler.offerValue(EMPTY_STRING);
+                                parserHandler.offerValue(EMPTY_STRING);
                             }
-                            mParserHandler.pairValueEnd(mLexer.getPosition());
+                            parserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
                         case QSToken.TYPE_COMMA: {
@@ -174,7 +177,7 @@ public class QSParser {
                         case QSToken.TYPE_DOT: {
                             mStatus = S_IN_FINISHED_DOT;
                             if (!options.isAllowDots()) {
-                                mParserHandler.appendLastPath(mToken.value);
+                                parserHandler.appendLastPath(mToken.value);
                             }
                             break;
                         }
@@ -188,7 +191,7 @@ public class QSParser {
                 case S_IN_FINISHED_COMMA: {
                     if (mToken.type == QSToken.TYPE_VALUE) {
                         mStatus = S_IN_FINISHED_VALUE;
-                        mParserHandler.offerValue(mToken.value);
+                        parserHandler.offerValue(mToken.value);
                     } else {
                         mStatus = S_IN_ERROR;
                     }
@@ -199,9 +202,9 @@ public class QSParser {
                         case QSToken.TYPE_VALUE: {
                             mStatus = S_IN_FINISHED_VALUE;
                             if (options.isAllowDots()) {
-                                mParserHandler.offerPath(mToken.value);
+                                parserHandler.offerPath(mToken.value);
                             } else {
-                                mParserHandler.appendLastPath(mToken.value);
+                                parserHandler.appendLastPath(mToken.value);
                             }
                             break;
                         }
@@ -224,10 +227,7 @@ public class QSParser {
             }
         } while (mToken.type != QSToken.TYPE_EOF);
 
-        QSObject qsObject = mParserHandler.getQSObject();
-        mParserHandler.reset();
-
-        return qsObject;
+        return parserHandler.getQSObject();
     }
 
     private void nextToken() throws IOException {

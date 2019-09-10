@@ -24,6 +24,12 @@ public class ParserHandler {
 
     private ParseOptions mOptions;
 
+    private int mParameterCount = 0;
+
+    public ParserHandler(ParseOptions mOptions) {
+        this.mOptions = mOptions;
+    }
+
     void switchMode(ArrayFormat format) {
         mArrayFormat = format;
     }
@@ -32,9 +38,9 @@ public class ParserHandler {
         return mArrayFormat == ArrayFormat.COMMA;
     }
 
-    void pairKeyStart(ParseOptions options, QSToken token) {
-        mOptions = options;
+    void pairKeyStart(QSToken token) {
         offerPath(token.value);
+        mParameterCount++;
     }
 
     void pairValueEnd(int position) throws ParseException {
@@ -43,6 +49,10 @@ public class ParserHandler {
         }
         handleDepth();
         put(position, mQSObject, mPathQueue, mValueList);
+    }
+
+    boolean isUpperLimit() {
+        return mParameterCount >= mOptions.getParameterLimit();
     }
 
     private void handleDepth() {
@@ -68,6 +78,7 @@ public class ParserHandler {
         mQSObject = newObject();
         mPathQueue = new LinkedList<>();
         mValueList = newArray();
+        mParameterCount = 0;
     }
 
     public void offerPath(String path) {
