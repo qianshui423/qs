@@ -59,12 +59,12 @@ public class StringifyOptions extends Options {
     }
 
     public static class Builder extends Options.Builder {
-        private boolean encode;
-        private boolean encodeValuesOnly;
-        private boolean indices;
-        private String arrayFormat;
-        private boolean addQueryPrefix;
-        private boolean skipNulls;
+        private boolean encode = ENCODE;
+        private boolean encodeValuesOnly = ENCODE_VALUES_ONLY;
+        private boolean indices = INDICES;
+        private String arrayFormat = ARRAY_FORMAT;
+        private boolean addQueryPrefix = ADD_QUERY_PREFIX;
+        private boolean skipNulls = SKIP_NULLS;
 
         public Builder setEncode(boolean encode) {
             this.encode = encode;

@@ -60,11 +60,11 @@ public class ParseOptions extends Options {
 
     public static class Builder extends Options.Builder {
         private int depth = DEPTH;
-        private int parameterLimit;
-        private boolean ignoreQueryPrefix;
-        private int arrayLimit;
-        private boolean parseArrays;
-        private boolean comma;
+        private int parameterLimit = PARAMETER_LIMIT;
+        private boolean ignoreQueryPrefix = IGNORE_QUERY_PREFIX;
+        private int arrayLimit = ARRAY_LIMIT;
+        private boolean parseArrays = PARSE_ARRAYS;
+        private boolean comma = COMMA;
 
         public Builder setDepth(int depth) {
             this.depth = depth;
