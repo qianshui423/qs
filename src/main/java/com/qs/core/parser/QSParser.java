@@ -1,6 +1,5 @@
 package com.qs.core.parser;
 
-import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSObject;
 
