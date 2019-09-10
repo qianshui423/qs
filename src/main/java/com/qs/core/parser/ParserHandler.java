@@ -87,7 +87,7 @@ public class ParserHandler {
 
     public void appendLastPath(String appendPath) {
         String lastPath = mPathQueue.pollLast();
-        mPathQueue.offer(lastPath + appendPath);
+        mPathQueue.offer((lastPath == null ? "" : lastPath) + appendPath);
     }
 
     public void offerValue(Object value) {

@@ -53,6 +53,7 @@ public class QSParser {
     }
 
     public QSObject parse(Reader in, ParseOptions options) throws IOException, ParseException {
+        skipQueryPrefix(in, options);
         reset(in);
         ParserHandler parserHandler = new ParserHandler(options);
         do {
@@ -228,6 +229,18 @@ public class QSParser {
         } while (mToken.type != QSToken.TYPE_EOF);
 
         return parserHandler.getQSObject();
+    }
+
+    private void skipQueryPrefix(Reader in, ParseOptions options) throws IOException {
+        if (options.isIgnoreQueryPrefix()) {
+            char[] head = new char[1];
+            int length = in.read(head, 0, 1);
+            if (length > 0) {
+                if (head[0] != '?') {
+                    in.reset();
+                }
+            }
+        }
     }
 
     private void nextToken() throws IOException {

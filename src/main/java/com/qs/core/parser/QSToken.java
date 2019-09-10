@@ -6,8 +6,8 @@ public class QSToken {
     public static final int TYPE_RIGHT_SQUARE = 4; // ]
     public static final int TYPE_EQUAL_SIGN = 2; // =
     public static final int TYPE_COMMA = 5; // ,
-    public static final int TYPE_DOT = 7; // .
-    public static final int TYPE_AND = 6; // &
+    public static final int TYPE_DOT = 6; // .
+    public static final int TYPE_AND = 7; // &
     public static final int TYPE_EOF = -1; // end of file
 
     public int type;
