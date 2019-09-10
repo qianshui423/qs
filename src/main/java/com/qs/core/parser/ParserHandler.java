@@ -104,10 +104,10 @@ public class ParserHandler {
             String path = pathQueue.get(i);
             if (current instanceof QSObject) {
                 QSObject object = (QSObject) current;
-                String pathString = String.valueOf(path);
-                child = object.get(pathString);
+                String wrapPath =  wrapPathValue(String.valueOf(path));
+                child = object.get(wrapPath);
                 if (child == null) child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
-                object.put(pathString, child);
+                object.put(wrapPath, child);
             } else {
                 if (isArrayIndex(path)) {
                     QSArray array = (QSArray) current;
@@ -122,9 +122,9 @@ public class ParserHandler {
                     }
                 } else {
                     QSObject convertObject = arrayToMap(current);
-                    String pathString = String.valueOf(path);
+                    String wrapPath = wrapPathValue(String.valueOf(path));
                     child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
-                    convertObject.put(pathString, child);
+                    convertObject.put(wrapPath, child);
                     connectToParent(parent, parentPath, convertObject);
                 }
             }
@@ -136,10 +136,10 @@ public class ParserHandler {
         String lastPath = pathQueue.peekLast();
         if (current instanceof QSObject) {
             QSObject object = (QSObject) current;
-            String pathString = String.valueOf(lastPath);
+            String wrapPath = wrapPathValue(String.valueOf(lastPath));
             Object value = processValue(valueList);
-            if (object.containsKey(pathString)) {
-                Object existObject = object.get(pathString);
+            if (object.containsKey(wrapPath)) {
+                Object existObject = object.get(wrapPath);
                 if (existObject instanceof QSArray) {
                     QSArray existArray = ((QSArray) existObject);
                     if (value instanceof QSArray) {
@@ -149,12 +149,12 @@ public class ParserHandler {
                     }
                 } else {
                     QSArray array = newArray();
-                    array.add(object.get(pathString));
+                    array.add(object.get(wrapPath));
                     array.add(value);
-                    object.put(pathString, array);
+                    object.put(wrapPath, array);
                 }
             } else {
-                object.put(pathString, value);
+                object.put(wrapPath, value);
             }
         } else {
             if (isArrayIndex(lastPath)) {
@@ -179,15 +179,16 @@ public class ParserHandler {
                 }
             } else {
                 Object value = processValue(valueList);
+                String wrapPath = wrapPathValue(String.valueOf(lastPath));
                 if (current instanceof QSArray) {
                     QSObject convertObject = arrayToMap(current);
-                    convertObject.put(String.valueOf(lastPath), value);
+                    convertObject.put(wrapPath, value);
                     connectToParent(parent, parentPath, convertObject);
                 } else {
                     QSArray newArray = newArray();
                     newArray.add(current);
                     QSObject newObject = newObject();
-                    newObject.put(String.valueOf(lastPath), value);
+                    newObject.put(wrapPath, value);
                     newArray.add(newObject);
                     connectToParent(parent, parentPath, newArray);
                 }
@@ -223,6 +224,13 @@ public class ParserHandler {
         return mValueList;
     }
 
+    private String wrapPathValue(String value) {
+        if (isBracketsEmptyIndex(value) && !mOptions.isParseArrays()) {
+            return "0";
+        }
+        return value;
+    }
+
     private QSArray newArray() {
         return new QSArray();
     }
@@ -232,7 +240,7 @@ public class ParserHandler {
     }
 
     private boolean isArrayIndex(String value) {
-        return isNaturalNumber(value) || isBracketsEmptyIndex(value);
+        return isNaturalNumber(value) || (isBracketsEmptyIndex(value) && mOptions.isParseArrays());
     }
 
     private boolean isNaturalNumber(String value) {

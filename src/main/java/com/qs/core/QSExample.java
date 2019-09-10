@@ -27,6 +27,7 @@ public class QSExample {
                             .setAllowDots(true)
                             .setStrictNullHandling(true)
                             .setIgnoreQueryPrefix(true)
+                            .setParseArrays(false)
                             .build());
             System.out.println(qsObject);
             String qsString = qsObject.toQString(new StringifyOptions.Builder().setStrictNullHandling(true).build());
