@@ -51,8 +51,8 @@ public class Stringifier {
         } else if (value instanceof QSObject) {
             sb.append(toQString((QSObject) value, pathStack, options));
         } else {
-            sb.append(toPathString(pathStack, options));
             if (value != null) {
+                sb.append(toPathString(pathStack, options));
                 sb.append('=');
                 if (options.isEncode() || options.isEncodeValuesOnly()) {
                     sb.append(QSEncoder.encode(String.valueOf(value)));
@@ -60,13 +60,18 @@ public class Stringifier {
                     sb.append(value);
                 }
             } else {
-                if (!options.isStrictNullHandling()) {
-                    sb.append('=');
+                if (!options.isSkipNulls()) {
+                    sb.append(toPathString(pathStack, options));
+                    if (!options.isStrictNullHandling()) {
+                        sb.append('=');
+                    }
                 }
             }
         }
         pathStack.remove(pathStack.size() - 1);
-        sb.append(options.getDelimiter());
+        if (value != null || !options.isSkipNulls()) {
+            sb.append(options.getDelimiter());
+        }
     }
 
     private static String toPathString(List<String> pathStack, StringifyOptions options) {
