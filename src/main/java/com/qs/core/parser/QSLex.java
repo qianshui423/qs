@@ -33,7 +33,7 @@ class QSLex {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED = 
-    "\46\0\1\1\26\0\1\4\35\0\1\2\1\0\1\3\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffb2\0";
+    "\46\0\1\1\26\0\1\2\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffd2\0";
 
   /** 
    * Translates characters to character classes
@@ -46,10 +46,10 @@ class QSLex {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\1\1\1\2\1\3\1\4\1\5";
+    "\1\0\1\1\1\2\1\3";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[6];
+    int [] result = new int[4];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -74,10 +74,10 @@ class QSLex {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\5\0\12\0\12\0\12\0\12";
+    "\0\0\0\3\0\6\0\6";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[6];
+    int [] result = new int[4];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -100,10 +100,10 @@ class QSLex {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\2\1\3\1\4\1\5\1\6\1\2\11\0";
+    "\1\2\1\3\1\4\1\2\5\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[15];
+    int [] result = new int[9];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -141,10 +141,10 @@ class QSLex {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\1\4\11";
+    "\1\0\1\1\2\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[6];
+    int [] result = new int[4];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -245,7 +245,7 @@ class QSLex {
     char [] map = new char[0x110000];
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
-    while (i < 50) {
+    while (i < 42) {
       int  count = packed.charAt(i++);
       char value = packed.charAt(i++);
       do map[j++] = value; while (--count > 0);
@@ -545,27 +545,17 @@ class QSLex {
             { return new QSToken(QSToken.TYPE_VALUE, yytext());
             } 
             // fall through
-          case 6: break;
+          case 4: break;
           case 2: 
             { return new QSToken(QSToken.TYPE_AND, yytext());
             } 
             // fall through
-          case 7: break;
+          case 5: break;
           case 3: 
-            { return new QSToken(QSToken.TYPE_LEFT_SQUARE, yytext());
-            } 
-            // fall through
-          case 8: break;
-          case 4: 
-            { return new QSToken(QSToken.TYPE_RIGHT_SQUARE, yytext());
-            } 
-            // fall through
-          case 9: break;
-          case 5: 
             { return new QSToken(QSToken.TYPE_EQUAL_SIGN, yytext());
             } 
             // fall through
-          case 10: break;
+          case 6: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

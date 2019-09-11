@@ -7,8 +7,6 @@ import com.qs.core.model.StringifyOptions;
 import com.qs.core.parser.ParseException;
 import com.qs.core.parser.QSParser;
 
-import java.util.Arrays;
-
 public class QSExample {
 
     public static void main(String[] args) {
@@ -24,9 +22,8 @@ public class QSExample {
         String queryString7 = "a[]=b";
         String queryString8 = "a.b=b.c";
         String queryString9 = "...a...b...=,,a,,b,,";
-        System.out.println(Arrays.asList(queryString9.split(",")));
         try {
-            QSObject qsObject = new QSParser().parse(queryString9,
+            QSObject qsObject = new QSParser().parse(queryString,
                     new ParseOptions.Builder()
                             .setDepth(10)
                             .setComma(true)
@@ -36,8 +33,25 @@ public class QSExample {
                             .setParseArrays(false)
                             .build());
             System.out.println(qsObject);
-            String qsString = qsObject.toQString(new StringifyOptions.Builder().setStrictNullHandling(true).build());
+
+            String qsString = qsObject.toQString(
+                    new StringifyOptions.Builder()
+                            .setStrictNullHandling(true)
+                            .build());
             System.out.println(qsString);
+
+
+            QSObject qsObject1 = new QSParser().parse(qsString,
+                    new ParseOptions.Builder()
+                            .setDepth(10)
+                            .setComma(true)
+                            .setAllowDots(true)
+                            .setStrictNullHandling(true)
+                            .setIgnoreQueryPrefix(true)
+                            .setParseArrays(false)
+                            .build());
+            System.out.println(qsObject1);
+
             String jsonString = qsObject.toJsonString();
             System.out.println(jsonString);
         } catch (ParseException e) {

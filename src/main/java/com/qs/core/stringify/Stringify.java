@@ -3,6 +3,7 @@ package com.qs.core.stringify;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
 import com.qs.core.model.StringifyOptions;
+import com.qs.core.uri.QSEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,12 @@ public class Stringify {
         } else {
             sb.append(toPathString(pathStack, options));
             if (value != null) {
-                sb.append('=').append(value);
+                sb.append('=');
+                if (options.isEncode() || options.isEncodeValuesOnly()) {
+                    sb.append(QSEncoder.encode(String.valueOf(value)));
+                } else {
+                    sb.append(value);
+                }
             } else {
                 if (!options.isStrictNullHandling()) {
                     sb.append('=');
@@ -63,6 +69,9 @@ public class Stringify {
             } else {
                 sb.append('[').append(pathStack.get(i)).append(']');
             }
+        }
+        if (options.isEncode()) {
+            return QSEncoder.encode(sb.toString());
         }
         return sb.toString();
     }

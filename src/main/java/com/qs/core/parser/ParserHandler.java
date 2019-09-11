@@ -4,6 +4,7 @@ import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
+import com.qs.core.uri.QSDecoder;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -34,8 +35,12 @@ public class ParserHandler {
         this.mOptions = mOptions;
     }
 
-    void pairKeyStart(QSToken token) {
-        offerPath(token.value);
+    void pairKeyStart(int position, QSToken token) throws ParseException {
+        String decodePath = QSDecoder.decode(token.value);
+        List<String> pathArray = PathParser.parse(decodePath, position);
+        for (int i = 0; i < pathArray.size(); i++) {
+            offerPath(pathArray.get(i));
+        }
         mParameterCount++;
     }
 
@@ -74,8 +79,8 @@ public class ParserHandler {
                 mPathQueue.offer(path);
             } else {
                 path = path.replaceAll(REGEX_FIRST_DOT, "");
-                String[] paths = path.split(REGEX_DOT);
-                mPathQueue.addAll(Arrays.asList(paths));
+                String[] pathArray = path.split(REGEX_DOT);
+                mPathQueue.addAll(Arrays.asList(pathArray));
             }
         } else {
             mPathQueue.offer(path);
@@ -83,16 +88,17 @@ public class ParserHandler {
     }
 
     public void offerValue(String value) {
-        if (mOptions.isComma() && !value.isEmpty()) {
-            int indexComma = value.indexOf(CHAR_COMMA);
+        String decodeValue = QSDecoder.decode(value);
+        if (mOptions.isComma() && !decodeValue.isEmpty()) {
+            int indexComma = decodeValue.indexOf(CHAR_COMMA);
             if (indexComma == -1) {
-                mValueList.add(value);
+                mValueList.add(decodeValue);
             } else {
-                String[] values = value.split(REGEX_COMMA, -1);
-                mValueList.addAll(Arrays.asList(values));
+                String[] valueArray = decodeValue.split(REGEX_COMMA, -1);
+                mValueList.addAll(Arrays.asList(valueArray));
             }
         } else {
-            mValueList.add(value);
+            mValueList.add(decodeValue);
         }
     }
 

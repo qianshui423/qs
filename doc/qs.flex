@@ -14,17 +14,13 @@ package com.qs.core.parser;
 
 %char
 
-UNESCAPED_CH = [^\[\]=&]
+UNESCAPED_CH = [^=&]
 
-LEFT_SQUARE = \[
-RIGHT_SQUARE = \]
 EQUAL_SIGN = =
 AND = &
 %%
 
 <YYINITIAL> {UNESCAPED_CH}+	        { return new QSToken(QSToken.TYPE_VALUE, yytext()); }
-<YYINITIAL> {LEFT_SQUARE} 	        { return new QSToken(QSToken.TYPE_LEFT_SQUARE, yytext()); }
-<YYINITIAL> {RIGHT_SQUARE} 	        { return new QSToken(QSToken.TYPE_RIGHT_SQUARE, yytext()); }
 <YYINITIAL> {EQUAL_SIGN}            { return new QSToken(QSToken.TYPE_EQUAL_SIGN, yytext()); }
 <YYINITIAL> {AND}	 		        { return new QSToken(QSToken.TYPE_AND, yytext()); }
 

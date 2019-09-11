@@ -6,11 +6,11 @@ public class StringifyOptions extends Options {
     public static final boolean ENCODE = true;
     // 是否仅对value进行URI编码
     public static final boolean ENCODE_VALUES_ONLY = false;
-    // 是否省略数组的[]
+    // 是否省略数组的[]，采用 repeat 模式表示数组
     public static final boolean INDICES = true;
     // 数组的表示形式
     public static final String ARRAY_FORMAT = ArrayFormat.INDICES.getCode();
-    // 是否添加&前缀
+    // 是否添加 ? 前缀
     public static final boolean ADD_QUERY_PREFIX = false;
     // 是否忽略null
     public static final boolean SKIP_NULLS = false;
@@ -23,8 +23,8 @@ public class StringifyOptions extends Options {
     private boolean skipNulls;
 
     private StringifyOptions(boolean allowDots, boolean strictNullHandling,
-                            boolean encode, boolean encodeValuesOnly, boolean indices,
-                            String arrayFormat, boolean addQueryPrefix, boolean skipNulls) {
+                             boolean encode, boolean encodeValuesOnly, boolean indices,
+                             String arrayFormat, boolean addQueryPrefix, boolean skipNulls) {
         super(allowDots, strictNullHandling);
         this.encode = encode;
         this.encodeValuesOnly = encodeValuesOnly;

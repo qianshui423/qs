@@ -9,25 +9,23 @@ import java.io.StringReader;
 
 public class QSParser {
 
-    public static final int S_INIT = 0;
-    public static final int S_IN_FINISHED_LEFT_SQUARE = 1;
-    public static final int S_IN_FINISHED_RIGHT_SQUARE = 2;
-    public static final int S_IN_FINISHED_VALUE = 3;
-    public static final int S_IN_FINISHED_EQUAL_SIGN = 4;
-    public static final int S_IN_ERROR = -1;
+    private static final int S_INIT = 0;
+    private static final int S_IN_FINISHED_VALUE = 1;
+    private static final int S_IN_FINISHED_EQUAL_SIGN = 2;
+    private static final int S_IN_ERROR = -1;
 
-    public static final String EMPTY_STRING = "";
+    private static final String EMPTY_STRING = "";
 
     private QSLex mLexer = new QSLex(null);
     private QSToken mToken = null;
     private int mStatus = S_INIT;
 
-    public void reset() {
+    private void reset() {
         mToken = null;
         mStatus = S_INIT;
     }
 
-    public void reset(Reader in) {
+    private void reset(Reader in) {
         mLexer.yyreset(in);
         reset();
     }
@@ -67,44 +65,8 @@ public class QSParser {
                             if (parserHandler.isUpperLimit()) {
                                 mToken = new QSToken(QSToken.TYPE_EOF, null);
                             } else {
-                                parserHandler.pairKeyStart(mToken);
+                                parserHandler.pairKeyStart(mLexer.getPosition(), mToken);
                             }
-                            break;
-                        }
-                        default: {
-                            mStatus = S_IN_ERROR;
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case S_IN_FINISHED_LEFT_SQUARE: {
-                    switch (mToken.type) {
-                        case QSToken.TYPE_VALUE: {
-                            mStatus = S_IN_FINISHED_VALUE;
-                            parserHandler.offerPath(mToken.value);
-                            break;
-                        }
-                        case QSToken.TYPE_RIGHT_SQUARE: {
-                            mStatus = S_IN_FINISHED_RIGHT_SQUARE;
-                            parserHandler.offerPath(ParserHandler.BRACKETS_EMPTY_INDEX);
-                            break;
-                        }
-                        default: {
-                            mStatus = S_IN_ERROR;
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case S_IN_FINISHED_RIGHT_SQUARE: {
-                    switch (mToken.type) {
-                        case QSToken.TYPE_LEFT_SQUARE: {
-                            mStatus = S_IN_FINISHED_LEFT_SQUARE;
-                            break;
-                        }
-                        case QSToken.TYPE_EQUAL_SIGN: {
-                            mStatus = S_IN_FINISHED_EQUAL_SIGN;
                             break;
                         }
                         default: {
@@ -137,14 +99,6 @@ public class QSParser {
                 }
                 case S_IN_FINISHED_VALUE: {
                     switch (mToken.type) {
-                        case QSToken.TYPE_LEFT_SQUARE: {
-                            mStatus = S_IN_FINISHED_LEFT_SQUARE;
-                            break;
-                        }
-                        case QSToken.TYPE_RIGHT_SQUARE: {
-                            mStatus = S_IN_FINISHED_RIGHT_SQUARE;
-                            break;
-                        }
                         case QSToken.TYPE_EQUAL_SIGN: {
                             mStatus = S_IN_FINISHED_EQUAL_SIGN;
                             break;
