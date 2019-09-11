@@ -4,7 +4,8 @@ import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
-import com.qs.core.uri.QSDecoder;
+import com.qs.core.util.NumberUtil;
+import com.qs.core.util.QSDecoder;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -16,12 +17,13 @@ public class ParserHandler {
     /**
      * 处理解析 {@link ArrayFormat#BRACKETS} 格式数组
      */
-    public static final String BRACKETS_EMPTY_INDEX = "-1";
-    public static final String CHAR_DOT = ".";
-    public static final String REGEX_FIRST_DOT = "^\\.+";
-    public static final String REGEX_DOT = "\\.+";
-    public static final String CHAR_COMMA = ",";
-    public static final String REGEX_COMMA = ",";
+    private static final String BRACKETS_EMPTY_INDEX = "";
+    private static final String CHAR_DOT = ".";
+    private static final String REGEX_FIRST_DOT = "^\\.+";
+    private static final String REGEX_DOT = "\\.+";
+    private static final String CHAR_COMMA = ",";
+    private static final String REGEX_COMMA = ",";
+    private static final String WRAP_DEFAULT_PATH = "0";
 
     private QSObject mQSObject = newObject();
     private LinkedList<String> mPathQueue = new LinkedList<>();
@@ -119,14 +121,19 @@ public class ParserHandler {
             } else {
                 if (isArrayIndex(path)) {
                     QSArray array = (QSArray) current;
-                    int pathIndex = Integer.valueOf(path);
-                    if (isBracketsEmptyIndex(path) || pathIndex == array.size()) {
+                    if (isBracketsEmptyIndex(path)) {
                         child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
                         array.add(child);
-                    } else if (pathIndex < array.size()) {
-                        child = array.get(pathIndex);
                     } else {
-                        throw new ParseException(position, ParseException.ERROR_SKIP_ADD_EXCEPTION, mPathQueue);
+                        int pathIndex = Integer.valueOf(path);
+                        if (pathIndex == array.size()) {
+                            child = isArrayIndex(pathQueue.get(i + 1)) ? newArray() : newObject();
+                            array.add(child);
+                        } else if (pathIndex < array.size()) {
+                            child = array.get(pathIndex);
+                        } else {
+                            throw new ParseException(position, ParseException.ERROR_SKIP_ADD_EXCEPTION, mPathQueue);
+                        }
                     }
                 } else {
                     QSObject convertObject = arrayToMap(current);
@@ -167,23 +174,27 @@ public class ParserHandler {
         } else {
             if (isArrayIndex(lastPath)) {
                 QSArray array = (QSArray) current;
-                int pathIndex = Integer.valueOf(lastPath);
                 Object value = processValue(valueList);
-                if (isBracketsEmptyIndex(lastPath) || pathIndex == array.size()) {
+                if (isBracketsEmptyIndex(lastPath)) {
                     array.add(value);
-                } else if (pathIndex < array.size()) {
-                    Object existObject = array.get(pathIndex);
-                    if (existObject instanceof QSArray) {
-                        QSArray existArray = ((QSArray) existObject);
-                        existArray.add(value);
-                    } else {
-                        QSArray childArray = newArray();
-                        childArray.add(existObject);
-                        childArray.add(value);
-                        array.set(pathIndex, childArray);
-                    }
                 } else {
-                    throw new ParseException(position, ParseException.ERROR_SKIP_ADD_EXCEPTION, mPathQueue);
+                    int pathIndex = Integer.valueOf(lastPath);
+                    if (pathIndex == array.size()) {
+                        array.add(value);
+                    } else if (pathIndex < array.size()) {
+                        Object existObject = array.get(pathIndex);
+                        if (existObject instanceof QSArray) {
+                            QSArray existArray = ((QSArray) existObject);
+                            existArray.add(value);
+                        } else {
+                            QSArray childArray = newArray();
+                            childArray.add(existObject);
+                            childArray.add(value);
+                            array.set(pathIndex, childArray);
+                        }
+                    } else {
+                        throw new ParseException(position, ParseException.ERROR_SKIP_ADD_EXCEPTION, mPathQueue);
+                    }
                 }
             } else {
                 Object value = processValue(valueList);
@@ -234,7 +245,7 @@ public class ParserHandler {
 
     private String wrapPathValue(String value) {
         if (isBracketsEmptyIndex(value) && !mOptions.isParseArrays()) {
-            return "0";
+            return WRAP_DEFAULT_PATH;
         }
         return value;
     }
@@ -248,24 +259,10 @@ public class ParserHandler {
     }
 
     private boolean isArrayIndex(String value) {
-        return isNaturalNumber(value) || (isBracketsEmptyIndex(value) && mOptions.isParseArrays());
-    }
-
-    private boolean isNaturalNumber(String value) {
-        try {
-            int number = Integer.valueOf(value);
-            return number >= 0;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return NumberUtil.isNaturalNumber(value) || (isBracketsEmptyIndex(value) && mOptions.isParseArrays());
     }
 
     private boolean isBracketsEmptyIndex(String value) {
-        try {
-            int number = Integer.valueOf(value);
-            return number == Integer.valueOf(BRACKETS_EMPTY_INDEX);
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return BRACKETS_EMPTY_INDEX.equals(value);
     }
 }

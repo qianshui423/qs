@@ -37,6 +37,8 @@ public class QSExample {
             String qsString = qsObject.toQString(
                     new StringifyOptions.Builder()
                             .setStrictNullHandling(true)
+                            .setEncode(false)
+                            .setIndices(false)
                             .build());
             System.out.println(qsString);
 

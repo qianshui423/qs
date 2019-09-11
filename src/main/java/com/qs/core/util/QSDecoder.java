@@ -1,19 +1,18 @@
-package com.qs.core.uri;
+package com.qs.core.util;
 
 import com.qs.core.model.Charset;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 
-public class QSEncoder {
+public class QSDecoder {
 
-    public static String encode(String input) {
+    public static String decode(String input) {
         try {
-            return URLEncoder.encode(input, Charset.UTF8.getCharset());
+            return URLDecoder.decode(input, Charset.UTF8.getCharset());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return "";
     }
-
 }

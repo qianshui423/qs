@@ -3,7 +3,8 @@ package com.qs.core.stringify;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
 import com.qs.core.model.StringifyOptions;
-import com.qs.core.uri.QSEncoder;
+import com.qs.core.util.NumberUtil;
+import com.qs.core.util.QSEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,11 +64,21 @@ public class Stringifier {
 
     private static String toPathString(List<String> pathStack, StringifyOptions options) {
         StringBuilder sb = new StringBuilder(33);
-        for (int i = 0, size = pathStack.size(); i < size; ++i) {
+        int size = pathStack.size();
+        for (int i = 0; i < size; ++i) {
+            String path = pathStack.get(i);
             if (i == 0) {
-                sb.append(pathStack.get(i));
+                sb.append(path);
+            } else if (i == size - 1) {
+                if (options.isIndices()) {
+                    sb.append('[').append(path).append(']');
+                } else {
+                    if(!NumberUtil.isNaturalNumber(path)) {
+                        sb.append(pathStack.get(i));
+                    }
+                }
             } else {
-                sb.append('[').append(pathStack.get(i)).append(']');
+                sb.append('[').append(path).append(']');
             }
         }
         if (options.isEncode()) {
@@ -75,6 +86,8 @@ public class Stringifier {
         }
         return sb.toString();
     }
+
+
 
     public static String toJsonString(QSObject object) {
         StringBuilder sb = new StringBuilder(33);

@@ -38,8 +38,7 @@ public class PathParser {
                     throw new ParseException(position, ParseException.ERROR_PARSE_PATH_EXCEPTION, key);
                 }
                 if (stack.isEmpty()) {
-                    String pathEntity = pathEntityCollector.toString();
-                    path.add(pathEntity.isEmpty() ? ParserHandler.BRACKETS_EMPTY_INDEX : pathEntity);
+                    path.add(pathEntityCollector.toString());
                     pathEntityCollector = new StringBuilder();
                 } else {
                     pathEntityCollector.append(ch);
