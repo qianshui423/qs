@@ -39,6 +39,7 @@ public class QSExample {
                             .setStrictNullHandling(true)
                             .setEncode(false)
                             .setIndices(false)
+                            .setAddQueryPrefix(true)
                             .build());
             System.out.println(qsString);
 

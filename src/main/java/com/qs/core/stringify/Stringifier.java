@@ -12,8 +12,15 @@ import java.util.Map;
 
 public class Stringifier {
 
+    private static final String QUERY_PREFIX = "?";
+
     public static String toQString(QSObject object, StringifyOptions options) {
-        return toQString(object, new ArrayList<>(), options);
+        StringBuilder sb = new StringBuilder();
+        if (options.isAddQueryPrefix()) {
+            sb.append(QUERY_PREFIX);
+        }
+        sb.append(toQString(object, new ArrayList<>(), options));
+        return sb.toString();
     }
 
     private static String toQString(QSObject object, List<String> pathStack, StringifyOptions options) {
@@ -73,8 +80,8 @@ public class Stringifier {
                 if (options.isIndices()) {
                     sb.append('[').append(path).append(']');
                 } else {
-                    if(!NumberUtil.isNaturalNumber(path)) {
-                        sb.append(pathStack.get(i));
+                    if (!NumberUtil.isNaturalNumber(path)) {
+                        sb.append('[').append(path).append(']');
                     }
                 }
             } else {
@@ -86,7 +93,6 @@ public class Stringifier {
         }
         return sb.toString();
     }
-
 
 
     public static String toJsonString(QSObject object) {
