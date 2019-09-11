@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Stringify {
+public class Stringifier {
 
     public static String toQString(QSObject object, StringifyOptions options) {
         return toQString(object, new ArrayList<>(), options);

@@ -3,7 +3,7 @@ package com.qs.core.model;
 import com.qs.core.formatter.QSFormatter;
 import com.qs.core.interfaces.QSAware;
 import com.qs.core.interfaces.QStreamAware;
-import com.qs.core.stringify.Stringify;
+import com.qs.core.stringify.Stringifier;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -27,7 +27,7 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
 
     @Override
     public String toQString(StringifyOptions options) {
-        return Stringify.toQString(this, options);
+        return Stringifier.toQString(this, options);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class QSObject extends LinkedHashMap<String, Object> implements QSAware, 
 
     @Override
     public String toJsonString() {
-        return Stringify.toJsonString(this);
+        return Stringifier.toJsonString(this);
     }
 
     @Override
