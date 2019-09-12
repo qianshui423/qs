@@ -97,7 +97,7 @@ public class Stringifier {
                         sb.append('[').append(path).append(']');
                     }
                 } else if (format == ArrayFormat.COMMA) {
-                    throw new UnsupportedOperationException("This feature is not currently supported. Later versions may support");
+                    throw new UnsupportedOperationException("Stringifier's ArrayFormat \"comma\" feature is not currently supported. Later versions may support");
                 }
             } else {
                 sb.append('[').append(path).append(']');

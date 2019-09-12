@@ -41,7 +41,7 @@ public class QSExample {
                             .setEncode(false)
                             .setAddQueryPrefix(true)
                             .setSkipNulls(true)
-                            .setArrayFormat(ArrayFormat.COMMA)
+                            .setArrayFormat(ArrayFormat.INDICES)
                             .build());
             System.out.println(qsString);
 
