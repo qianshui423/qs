@@ -6,10 +6,8 @@ public class StringifyOptions extends Options {
     public static final boolean ENCODE = true;
     // 是否仅对value进行URI编码
     public static final boolean ENCODE_VALUES_ONLY = false;
-    // 是否省略数组的[]，采用 repeat 模式表示数组
-    public static final boolean INDICES = true;
     // 数组的表示形式
-    public static final String ARRAY_FORMAT = ArrayFormat.INDICES.getCode();
+    public static final ArrayFormat ARRAY_FORMAT = ArrayFormat.INDICES;
     // 是否添加 ? 前缀
     public static final boolean ADD_QUERY_PREFIX = false;
     // 是否忽略null
@@ -17,18 +15,15 @@ public class StringifyOptions extends Options {
 
     private boolean encode;
     private boolean encodeValuesOnly;
-    private boolean indices;
-    private String arrayFormat;
+    private ArrayFormat arrayFormat;
     private boolean addQueryPrefix;
     private boolean skipNulls;
 
     private StringifyOptions(boolean allowDots, boolean strictNullHandling,
-                             boolean encode, boolean encodeValuesOnly, boolean indices,
-                             String arrayFormat, boolean addQueryPrefix, boolean skipNulls) {
+                             boolean encode, boolean encodeValuesOnly, ArrayFormat arrayFormat, boolean addQueryPrefix, boolean skipNulls) {
         super(allowDots, strictNullHandling);
         this.encode = encode;
         this.encodeValuesOnly = encodeValuesOnly;
-        this.indices = indices;
         this.arrayFormat = arrayFormat;
         this.addQueryPrefix = addQueryPrefix;
         this.skipNulls = skipNulls;
@@ -42,11 +37,7 @@ public class StringifyOptions extends Options {
         return encodeValuesOnly;
     }
 
-    public boolean isIndices() {
-        return indices;
-    }
-
-    public String getArrayFormat() {
+    public ArrayFormat getArrayFormat() {
         return arrayFormat;
     }
 
@@ -61,8 +52,7 @@ public class StringifyOptions extends Options {
     public static class Builder extends Options.Builder {
         private boolean encode = ENCODE;
         private boolean encodeValuesOnly = ENCODE_VALUES_ONLY;
-        private boolean indices = INDICES;
-        private String arrayFormat = ARRAY_FORMAT;
+        private ArrayFormat arrayFormat = ARRAY_FORMAT;
         private boolean addQueryPrefix = ADD_QUERY_PREFIX;
         private boolean skipNulls = SKIP_NULLS;
 
@@ -76,13 +66,12 @@ public class StringifyOptions extends Options {
             return this;
         }
 
-        public Builder setIndices(boolean indices) {
-            this.indices = indices;
-            return this;
-        }
-
-        public Builder setArrayFormat(String arrayFormat) {
-            this.arrayFormat = arrayFormat;
+        public Builder setArrayFormat(ArrayFormat arrayFormat) {
+            if (arrayFormat == null) {
+                this.arrayFormat = ArrayFormat.INDICES;
+            } else {
+                this.arrayFormat = arrayFormat;
+            }
             return this;
         }
 
@@ -109,7 +98,7 @@ public class StringifyOptions extends Options {
         public StringifyOptions build() {
             Options options = super.build();
             return new StringifyOptions(options.isAllowDots(), options.isStrictNullHandling(),
-                    encode, encodeValuesOnly, indices, arrayFormat, addQueryPrefix, skipNulls);
+                    encode, encodeValuesOnly, arrayFormat, addQueryPrefix, skipNulls);
         }
     }
 }

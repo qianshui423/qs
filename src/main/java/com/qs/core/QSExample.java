@@ -1,6 +1,7 @@
 package com.qs.core;
 
 import com.qs.core.log.Logger;
+import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSObject;
 import com.qs.core.model.StringifyOptions;
@@ -38,9 +39,9 @@ public class QSExample {
                     new StringifyOptions.Builder()
                             .setStrictNullHandling(true)
                             .setEncode(false)
-                            .setIndices(false)
                             .setAddQueryPrefix(true)
                             .setSkipNulls(true)
+                            .setArrayFormat(ArrayFormat.COMMA)
                             .build());
             System.out.println(qsString);
 
@@ -52,7 +53,7 @@ public class QSExample {
                             .setAllowDots(true)
                             .setStrictNullHandling(true)
                             .setIgnoreQueryPrefix(true)
-                            .setParseArrays(false)
+                            .setParseArrays(true)
                             .build());
             System.out.println(qsObject1);
 

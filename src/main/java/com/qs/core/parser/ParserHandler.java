@@ -259,7 +259,7 @@ public class ParserHandler {
     }
 
     private boolean isArrayIndex(String value) {
-        return NumberUtil.isNaturalNumber(value) || (isBracketsEmptyIndex(value) && mOptions.isParseArrays());
+        return (NumberUtil.isNaturalNumber(value) || isBracketsEmptyIndex(value)) && mOptions.isParseArrays();
     }
 
     private boolean isBracketsEmptyIndex(String value) {

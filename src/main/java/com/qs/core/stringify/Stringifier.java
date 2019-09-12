@@ -1,5 +1,6 @@
 package com.qs.core.stringify;
 
+import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
 import com.qs.core.model.StringifyOptions;
@@ -81,13 +82,22 @@ public class Stringifier {
             String path = pathStack.get(i);
             if (i == 0) {
                 sb.append(path);
-            } else if (i == size - 1) {
-                if (options.isIndices()) {
+            } else if (i == size - 1) { // 最后一个 path 的处理
+                ArrayFormat format = options.getArrayFormat();
+                if (format == ArrayFormat.INDICES) {
                     sb.append('[').append(path).append(']');
-                } else {
+                } else if (format == ArrayFormat.BRACKETS) {
+                    if (NumberUtil.isNaturalNumber(path)) {
+                        sb.append("[]");
+                    } else {
+                        sb.append('[').append(path).append(']');
+                    }
+                } else if (format == ArrayFormat.REPEAT) {
                     if (!NumberUtil.isNaturalNumber(path)) {
                         sb.append('[').append(path).append(']');
                     }
+                } else if (format == ArrayFormat.COMMA) {
+
                 }
             } else {
                 sb.append('[').append(path).append(']');
