@@ -4,7 +4,6 @@ import com.qs.core.model.ArrayFormat;
 import com.qs.core.model.QSArray;
 import com.qs.core.model.QSObject;
 import com.qs.core.model.StringifyOptions;
-import com.qs.core.util.NumberUtil;
 import com.qs.core.util.QSEncoder;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class Stringifier {
         return sb.toString();
     }
 
-    private static String toQString(QSObject object, List<String> pathStack, StringifyOptions options) {
+    private static String toQString(QSObject object, List<Object> pathStack, StringifyOptions options) {
         if (pathStack == null) pathStack = new ArrayList<>();
         StringBuilder sb = new StringBuilder(33);
         for (Map.Entry<String, Object> entry : object.entrySet()) {
@@ -35,20 +34,24 @@ public class Stringifier {
         return sb.toString();
     }
 
-    private static String toQString(QSArray array, List<String> pathStack, StringifyOptions options) {
+    private static String toQString(QSArray array, List<Object> pathStack, StringifyOptions options) {
         if (pathStack == null) pathStack = new ArrayList<>();
         StringBuilder sb = new StringBuilder(33);
         for (int i = 0, size = array.size(); i < size; ++i) {
-            pathStack.add(String.valueOf(i));
+            pathStack.add(i);
             toQString(array.get(i), sb, pathStack, options);
         }
         if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 
-    private static void toQString(Object value, StringBuilder sb, List<String> pathStack, StringifyOptions options) {
+    private static void toQString(Object value, StringBuilder sb, List<Object> pathStack, StringifyOptions options) {
         if (value instanceof QSArray) {
-            sb.append(toQString((QSArray) value, pathStack, options));
+            if (options.getArrayFormat() == ArrayFormat.COMMA) {
+                sb.append(toCommaQString((QSArray) value, pathStack, options));
+            } else {
+                sb.append(toQString((QSArray) value, pathStack, options));
+            }
         } else if (value instanceof QSObject) {
             sb.append(toQString((QSObject) value, pathStack, options));
         } else {
@@ -75,32 +78,46 @@ public class Stringifier {
         }
     }
 
-    private static String toPathString(List<String> pathStack, StringifyOptions options) {
+    private static String toCommaQString(QSArray array, List<Object> pathStack, StringifyOptions options) {
+        StringBuilder sb = new StringBuilder(33);
+        sb.append(toPathString(pathStack, options)).append("=");
+        for (int i = 0, size = array.size(); i < size; ++i) {
+            Object value = array.get(i);
+            if (value != null) {
+                sb.append(value);
+            }
+            sb.append(",");
+        }
+        if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    private static String toPathString(List<Object> pathStack, StringifyOptions options) {
         StringBuilder sb = new StringBuilder(33);
         int size = pathStack.size();
         for (int i = 0; i < size; ++i) {
-            String path = pathStack.get(i);
+            Object path = pathStack.get(i);
             if (i == 0) {
                 sb.append(path);
             } else if (i == size - 1) { // 最后一个 path 的处理
                 ArrayFormat format = options.getArrayFormat();
                 if (format == ArrayFormat.INDICES) {
-                    sb.append('[').append(path).append(']');
+                    sb.append("[").append(path).append("]");
                 } else if (format == ArrayFormat.BRACKETS) {
-                    if (NumberUtil.isNaturalNumber(path)) {
+                    if (isIntegerType(path)) {
                         sb.append("[]");
                     } else {
-                        sb.append('[').append(path).append(']');
+                        sb.append("[").append(path).append("]");
                     }
                 } else if (format == ArrayFormat.REPEAT) {
-                    if (!NumberUtil.isNaturalNumber(path)) {
-                        sb.append('[').append(path).append(']');
+                    if (!isIntegerType(path)) {
+                        sb.append("[").append(path).append("]");
                     }
                 } else if (format == ArrayFormat.COMMA) {
-                    throw new UnsupportedOperationException("Stringifier's ArrayFormat \"comma\" feature is not currently supported. Later versions may support");
+                    sb.append("[").append(path).append("]");
                 }
             } else {
-                sb.append('[').append(path).append(']');
+                sb.append("[").append(path).append("]");
             }
         }
         if (options.isEncode()) {
@@ -109,12 +126,16 @@ public class Stringifier {
         return sb.toString();
     }
 
+    private static boolean isIntegerType(Object value) {
+        return value instanceof Integer;
+    }
+
 
     public static String toJsonString(QSObject object) {
         StringBuilder sb = new StringBuilder(33);
         sb.append("{");
         for (Map.Entry<String, Object> entry : object.entrySet()) {
-            sb.append('"').append(entry.getKey()).append("\":");
+            sb.append("\"").append(entry.getKey()).append("\":");
             toJsonString(entry.getValue(), sb);
         }
         if (sb.length() > 1) sb.deleteCharAt(sb.length() - 1);
@@ -135,7 +156,7 @@ public class Stringifier {
 
     private static void toJsonString(Object value, StringBuilder sb) {
         if (value instanceof String) {
-            sb.append('"').append((String) value).append('"');
+            sb.append("\"").append((String) value).append("\"");
         } else if (value instanceof QSArray) {
             sb.append(toJsonString((QSArray) value));
         } else if (value instanceof QSObject) {
@@ -145,8 +166,8 @@ public class Stringifier {
         } else if (value == null) {
             sb.append("null");
         } else {
-            sb.append('"').append(value.toString()).append('"');
+            sb.append("\"").append(value.toString()).append("\"");
         }
-        sb.append(',');
+        sb.append(",");
     }
 }
