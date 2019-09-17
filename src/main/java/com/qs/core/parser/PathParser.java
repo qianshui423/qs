@@ -17,21 +17,24 @@ public class PathParser {
         LinkedList<Character> stack = new LinkedList<>();
         List<String> path = new ArrayList<>();
         StringBuilder pathEntityCollector = new StringBuilder();
-        char zeroCH = key.charAt(0);
-        if (zeroCH == TYPE_LEFT_SQUARE) {
-            stack.push(zeroCH);
-        } else if (zeroCH == TYPE_RIGHT_SQUARE) {
-            throw new ParseException(position, ParseException.ERROR_PARSE_PATH_EXCEPTION, key);
-        } else {
-            pathEntityCollector.append(zeroCH);
-        }
-        for (int i = 1; i < key.length(); i++) {
-            char ch = key.charAt(i);
+        // 取出第一个path
+        int index = 0;
+        for (; index < key.length(); index++) {
+            char ch = key.charAt(index);
             if (ch == TYPE_LEFT_SQUARE) {
-                char preCh = key.charAt(i - 1);
-                if (preCh != TYPE_RIGHT_SQUARE) {
-                    path.add(pathEntityCollector.toString());
-                    pathEntityCollector = new StringBuilder();
+                break;
+            } else {
+                pathEntityCollector.append(ch);
+            }
+        }
+        path.add(pathEntityCollector.toString());
+        if (index == key.length()) return path;
+        pathEntityCollector = new StringBuilder();
+        for (; index < key.length(); index++) {
+            char ch = key.charAt(index);
+            if (ch == TYPE_LEFT_SQUARE) {
+                if (!stack.isEmpty()) {
+                    pathEntityCollector.append(ch);
                 }
                 stack.push(ch);
             } else if (ch == TYPE_RIGHT_SQUARE) {
@@ -51,9 +54,6 @@ public class PathParser {
             }
         }
         if (!stack.isEmpty()) throw new ParseException(position, ParseException.ERROR_PARSE_PATH_EXCEPTION, key);
-        if (pathEntityCollector.length() != 0) {
-            path.add(pathEntityCollector.toString());
-        }
         return path;
     }
 

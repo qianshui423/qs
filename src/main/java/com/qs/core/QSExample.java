@@ -6,9 +6,6 @@ import com.qs.core.model.ParseOptions;
 import com.qs.core.model.QSObject;
 import com.qs.core.model.StringifyOptions;
 import com.qs.core.parser.ParseException;
-import com.qs.core.parser.QSParser;
-
-import java.util.Arrays;
 
 public class QSExample {
 
@@ -27,7 +24,7 @@ public class QSExample {
         String queryString9 = "...a...b...=,,a,,b,,";
         String queryString10 = "c1[b2][0][d1]=1&c1[b2][0][d2]=2";
         try {
-            QSObject qsObject = new QSParser().parse(queryString10,
+            QSObject qsObject = QS.parse(queryString,
                     new ParseOptions.Builder()
                             .setDepth(10)
                             .setComma(true)
@@ -38,30 +35,30 @@ public class QSExample {
                             .build());
             System.out.println(qsObject.toFormatString());
 
-//            String qsString = qsObject.toQString(
-//                    new StringifyOptions.Builder()
-//                            .setStrictNullHandling(true)
-//                            .setEncode(false)
-//                            .setAddQueryPrefix(true)
-//                            .setSkipNulls(true)
-//                            .setArrayFormat(ArrayFormat.COMMA)
-//                            .build());
-//            System.out.println(qsString);
-//
-//
-//            QSObject qsObject1 = new QSParser().parse(qsString,
-//                    new ParseOptions.Builder()
-//                            .setDepth(10)
-//                            .setComma(true)
-//                            .setAllowDots(true)
-//                            .setStrictNullHandling(true)
-//                            .setIgnoreQueryPrefix(true)
-//                            .setParseArrays(true)
-//                            .build());
-//            System.out.println(qsObject1.toFormatString());
-//
-//            String jsonString = qsObject.toJsonString();
-//            System.out.println(jsonString);
+            String qsString = qsObject.toQString(
+                    new StringifyOptions.Builder()
+                            .setStrictNullHandling(true)
+                            .setEncode(false)
+                            .setAddQueryPrefix(true)
+                            .setSkipNulls(true)
+                            .setArrayFormat(ArrayFormat.COMMA)
+                            .build());
+            System.out.println(qsString);
+
+
+            QSObject qsObject1 = QS.parse(qsString,
+                    new ParseOptions.Builder()
+                            .setDepth(10)
+                            .setComma(true)
+                            .setAllowDots(true)
+                            .setStrictNullHandling(true)
+                            .setIgnoreQueryPrefix(true)
+                            .setParseArrays(true)
+                            .build());
+            System.out.println(qsObject1.toFormatString());
+
+            String jsonString = qsObject.toJsonString();
+            System.out.println(jsonString);
         } catch (ParseException e) {
             e.printStackTrace();
         }

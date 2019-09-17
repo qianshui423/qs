@@ -71,7 +71,7 @@ public class ParserHandler {
 
     private void offerValue(String value) {
         String decodeValue = QSDecoder.decode(value);
-        if (mOptions.isComma() && !decodeValue.isEmpty()) {
+        if (mOptions.isComma() && decodeValue != null && !decodeValue.isEmpty()) {
             int indexComma = decodeValue.indexOf(CHAR_COMMA);
             if (indexComma == -1) {
                 mValueList.add(decodeValue);

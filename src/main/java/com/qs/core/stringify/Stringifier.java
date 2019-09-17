@@ -14,6 +14,10 @@ public class Stringifier {
 
     private static final String QUERY_PREFIX = "?";
 
+    public static String toQString(QSObject object) {
+        return toQString(object, new StringifyOptions.Builder().build());
+    }
+
     public static String toQString(QSObject object, StringifyOptions options) {
         StringBuilder sb = new StringBuilder();
         if (options.isAddQueryPrefix()) {
