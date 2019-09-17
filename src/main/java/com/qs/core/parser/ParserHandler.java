@@ -14,6 +14,8 @@ import java.util.List;
 
 public class ParserHandler {
 
+    private static final String REGEX_EQUAL_SIGN = "\\=";
+    private static final String EMPTY_STRING = "";
     /**
      * 处理解析 {@link ArrayFormat#BRACKETS} 格式数组
      */
@@ -37,8 +39,29 @@ public class ParserHandler {
         this.mOptions = mOptions;
     }
 
-    void pairKeyStart(int position, QSToken token) throws ParseException {
-        String decodePath = QSDecoder.decode(token.value);
+    void offerPair(String kvPair, int position) throws ParseException {
+        String[] kvArray = kvPair.split(REGEX_EQUAL_SIGN, 2);
+        offerEncodePath(kvArray[0], position);
+        if (kvArray.length == 1) { // 没有value存在时
+            if (mOptions.isStrictNullHandling()) {
+                offerValue(null);
+            } else {
+                offerValue(EMPTY_STRING);
+            }
+        } else {
+            offerValue(kvArray[1]);
+        }
+
+        handleDepth();
+        put(position, mQSObject, mPathQueue, mValueList);
+    }
+
+    boolean isUpperLimit() {
+        return mParameterCount >= mOptions.getParameterLimit();
+    }
+
+    private void offerEncodePath(String key, int position) throws ParseException {
+        String decodePath = QSDecoder.decode(key);
         List<String> pathArray = PathParser.parse(decodePath, position);
         for (int i = 0; i < pathArray.size(); i++) {
             offerPath(pathArray.get(i));
@@ -46,13 +69,19 @@ public class ParserHandler {
         mParameterCount++;
     }
 
-    void pairValueEnd(int position) throws ParseException {
-        handleDepth();
-        put(position, mQSObject, mPathQueue, mValueList);
-    }
-
-    boolean isUpperLimit() {
-        return mParameterCount >= mOptions.getParameterLimit();
+    private void offerValue(String value) {
+        String decodeValue = QSDecoder.decode(value);
+        if (mOptions.isComma() && !decodeValue.isEmpty()) {
+            int indexComma = decodeValue.indexOf(CHAR_COMMA);
+            if (indexComma == -1) {
+                mValueList.add(decodeValue);
+            } else {
+                String[] valueArray = decodeValue.split(REGEX_COMMA, -1);
+                mValueList.addAll(Arrays.asList(valueArray));
+            }
+        } else {
+            mValueList.add(decodeValue);
+        }
     }
 
     private void handleDepth() {
@@ -70,11 +99,7 @@ public class ParserHandler {
         }
     }
 
-    public QSObject getQSObject() {
-        return mQSObject;
-    }
-
-    public void offerPath(String path) {
+    private void offerPath(String path) {
         if (mOptions.isAllowDots() && path.length() > 1) { // 不允许 . 分割或者 path 为 1 时，则直接加入到 queue 中
             int indexDot = path.indexOf(CHAR_DOT);
             if (indexDot == -1) {
@@ -89,19 +114,8 @@ public class ParserHandler {
         }
     }
 
-    public void offerValue(String value) {
-        String decodeValue = QSDecoder.decode(value);
-        if (mOptions.isComma() && !decodeValue.isEmpty()) {
-            int indexComma = decodeValue.indexOf(CHAR_COMMA);
-            if (indexComma == -1) {
-                mValueList.add(decodeValue);
-            } else {
-                String[] valueArray = decodeValue.split(REGEX_COMMA, -1);
-                mValueList.addAll(Arrays.asList(valueArray));
-            }
-        } else {
-            mValueList.add(decodeValue);
-        }
+    QSObject getQSObject() {
+        return mQSObject;
     }
 
     private void put(int position, @Nonnull QSObject qsObject, LinkedList<String> pathQueue, QSArray valueList) throws ParseException {

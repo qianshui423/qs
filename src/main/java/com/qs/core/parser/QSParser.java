@@ -11,10 +11,7 @@ public class QSParser {
 
     private static final int S_INIT = 0;
     private static final int S_IN_FINISHED_VALUE = 1;
-    private static final int S_IN_FINISHED_EQUAL_SIGN = 2;
     private static final int S_IN_ERROR = -1;
-
-    private static final String EMPTY_STRING = "";
 
     private QSLex mLexer = new QSLex(null);
     private QSToken mToken = null;
@@ -65,29 +62,8 @@ public class QSParser {
                             if (parserHandler.isUpperLimit()) {
                                 mToken = new QSToken(QSToken.TYPE_EOF, null);
                             } else {
-                                parserHandler.pairKeyStart(mLexer.getPosition(), mToken);
+                                parserHandler.offerPair(mToken.value, mLexer.getPosition());
                             }
-                            break;
-                        }
-                        default: {
-                            mStatus = S_IN_ERROR;
-                            break;
-                        }
-                    }
-                    break;
-                }
-                case S_IN_FINISHED_EQUAL_SIGN: {
-                    switch (mToken.type) {
-                        case QSToken.TYPE_VALUE: {
-                            mStatus = S_IN_FINISHED_VALUE;
-                            parserHandler.offerValue(mToken.value);
-                            break;
-                        }
-                        case QSToken.TYPE_AND:
-                        case QSToken.TYPE_EOF: {
-                            mStatus = S_INIT;
-                            parserHandler.offerValue(EMPTY_STRING);
-                            parserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
                         default: {
@@ -99,17 +75,9 @@ public class QSParser {
                 }
                 case S_IN_FINISHED_VALUE: {
                     switch (mToken.type) {
-                        case QSToken.TYPE_EQUAL_SIGN: {
-                            mStatus = S_IN_FINISHED_EQUAL_SIGN;
-                            break;
-                        }
                         case QSToken.TYPE_AND:
                         case QSToken.TYPE_EOF: {
                             mStatus = S_INIT;
-                            if (!options.isStrictNullHandling()) {
-                                parserHandler.offerValue(EMPTY_STRING);
-                            }
-                            parserHandler.pairValueEnd(mLexer.getPosition());
                             break;
                         }
                         default: {

@@ -11,6 +11,9 @@ public class PathParser {
     private static final char TYPE_RIGHT_SQUARE = ']';
 
     public static List<String> parse(String key, int position) throws ParseException {
+        if (key == null || "".equals(key)) {
+            throw new ParseException(position, ParseException.ERROR_PARSE_PATH_EXCEPTION, key);
+        }
         LinkedList<Character> stack = new LinkedList<>();
         List<String> path = new ArrayList<>();
         StringBuilder pathEntityCollector = new StringBuilder();
@@ -48,6 +51,9 @@ public class PathParser {
             }
         }
         if (!stack.isEmpty()) throw new ParseException(position, ParseException.ERROR_PARSE_PATH_EXCEPTION, key);
+        if (pathEntityCollector.length() != 0) {
+            path.add(pathEntityCollector.toString());
+        }
         return path;
     }
 
