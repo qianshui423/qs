@@ -1,4 +1,7 @@
 # qs
+
+[![Build Status](https://travis-ci.org/qianshui423/qs.svg?branch=master)](https://travis-ci.org/qianshui423/qs)
+
 A querystring parser with nesting support
 
 # License 📄
