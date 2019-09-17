@@ -5,31 +5,31 @@ package com.qs.core.parser
 
 import com.qs.core.model.QSArray
 import com.qs.core.model.QSObject
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll;
 
 class QSParserTest extends Specification {
 
-    static def expectResultC1 = new HashMap()
-
-    static {
-        def b2 = new QSArray()
-        def d1d2 = new QSObject()
-        d1d2.put("d1", 1)
-        d1d2.put("d2", 2)
-        b2.add(d1d2)
-        expectResultC1.put("c1", b2)
-        def parser = new QSParser()
-        print(parser.parse("c1[b2][0][d1]=1&c1[b2][0][d2]=2"))
-    }
+    @Shared
+    def expectResultC1 = new QSObject()
 
     @Unroll
     def "qs parser"(String input, Object output) {
         setup:
         def parser = new QSParser()
+        def b2Array = new QSArray()
+        def d1d2 = new QSObject()
+        d1d2.put("d1", 1)
+        d1d2.put("d2", 2)
+        b2Array.add(d1d2)
+        def b2Object = new QSObject()
+        b2Object.put("b2", b2Array)
+        expectResultC1.put("c1", b2Object)
+
 
         expect:
-        ObjectEqual.equals(parser.parse(input), equals(output))
+        ObjectEqual.equals(parser.parse(input), expectResultC1)
 
         where:
         input                             || output
