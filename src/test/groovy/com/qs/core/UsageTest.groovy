@@ -1,6 +1,6 @@
-package com.qs.core.parser
+package com.qs.core
 
-import com.qs.core.QS
+
 import com.qs.core.model.QSObject
 import spock.lang.Shared
 import spock.lang.Specification

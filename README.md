@@ -14,6 +14,10 @@ The idea for Java qs module comes from js [qs][1]
 
 > Can't support set 'indices' when stringify. I think that the parameter is conflict with arrayFormat's 'indices'.
 
+> Can't support skip add element for arrayFormat's 'indices' when parsing.
+
+> Can't support set 'arrayLimit' when parsing. the implementation way does not need to rely on this.
+
 # Usage
 
 Test Case: UsageTest
@@ -161,6 +165,104 @@ parse result
 ```text
 { a: { b: 'c' } }
 ```
+
+# Parsing Arrays
+
+qs can also parse arrays using a similar [] notation:
+
+```java
+QS.parse("a[]=b&a[]=c");
+```
+
+parse result
+
+```text
+{ a: ['b', 'c'] }
+```
+
+You may specify an index as well:
+
+```java
+QS.parse("a[0]=c&a[1]=b");
+```
+
+parse result
+
+```text
+{ a: ['b', 'c'] }
+```
+
+Note that an empty string is also a value, and will be preserved:
+
+```java
+QS.parse("a[]=&a[]=b");
+```
+
+parse result
+
+```text
+{ a: ['', 'b'] }
+```
+
+```java
+QS.parse("a[0]=b&a[1]=&a[2]=c");
+```
+
+parse result
+
+```text
+{ a: ['b', '', 'c'] }
+```
+
+To disable array parsing entirely, set parseArrays to false.
+
+```java
+QS.parse("a[]=b", new ParseOptions.Builder().setParseArrays(false).build());
+```
+
+parse result
+
+```text
+{ a: { '0': 'b' } }
+```
+
+If you mix notations, qs will merge the two items into an object:
+
+```java
+QS.parse("a[0]=b&a[b]=c");
+```
+
+parse result
+
+```text
+{ a: { '0': 'b', b: 'c' } }
+```
+
+You can also create arrays of objects:
+
+```java
+QS.parse("a[][b]=c");
+```
+
+parse result
+
+```text
+{ a: [{ b: 'c' }] }
+```
+
+Some people use comma to join array, qs can parse it:
+
+```java
+QS.parse("a=b,c", new ParseOptions.Builder().setComma(true).build());
+```
+
+parse result
+
+```text
+{ a: ['b', 'c'] }
+```
+
+(this cannot convert nested objects, such as a={b:1},{c:d})
 
 
 # License 📄

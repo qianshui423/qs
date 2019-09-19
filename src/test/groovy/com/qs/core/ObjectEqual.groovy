@@ -1,4 +1,4 @@
-package com.qs.core.parser;
+package com.qs.core;
 
 class ObjectEqual {
 

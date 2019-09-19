@@ -127,7 +127,12 @@ public class Stringifier {
                         sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
                     }
                 } else {
-                    sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                    ArrayFormat format = options.getArrayFormat();
+                    if (format == ArrayFormat.BRACKETS && isIntegerType(path)) {
+                        sb.append(LEFT_SQUARE).append(RIGHT_SQUARE);
+                    } else {
+                        sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                    }
                 }
             }
         }
