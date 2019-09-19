@@ -6,6 +6,14 @@ A querystring parsing and stringifying library.
 
 The idea for Java qs module comes from js [qs][1]
 
+# Different from js qs
+
+> PlainObjects is supported by default. 'plainObjects', 'allowPrototypes' and 'delimiter' parameter are not supported when parsing .
+
+> UTF-8 is supported by default. Can't support set other charset when parsing or stringify.
+
+> Can't support set 'indices' when stringify. I think that the parameter is conflict with arrayFormat's 'indices'.
+
 # Usage
 
 Test Case: UsageTest
@@ -104,6 +112,54 @@ parse result
         }
     }
 }
+```
+
+This depth can be overridden by passing a depth option to qs.parse(string, [options]):
+
+```java
+QS.parse("a[b][c][d][e][f][g][h][i]=j", new ParseOptions.Builder().setDepth(1).build());
+```
+
+```text
+{ a: { b: { '[c][d][e][f][g][h][i]': 'j' } } }
+```
+
+The depth limit helps mitigate abuse when qs is used to parse user input, and it is recommended to keep it a reasonably small number.
+
+For similar reasons, by default qs will only parse up to 1000 parameters. This can be overridden by passing a parameterLimit option:
+
+```java
+QS.parse("a=b&c=d", new ParseOptions.Builder().setParameterLimit(1).build());
+```
+
+parse result
+
+```text
+{ a: 'b' }
+```
+
+To bypass the leading question mark, use ignoreQueryPrefix:
+
+```java
+QS.parse("?a=b&c=d", new ParseOptions.Builder().setIgnoreQueryPrefix(true).build());
+```
+
+parse result
+
+```text
+{ a: 'b', c: 'd' }
+```
+
+Option allowDots can be used to enable dot notation:
+
+```java
+QS.parse("a.b=c", new ParseOptions.Builder().setAllowDots(true).build());
+```
+
+parse result
+
+```text
+{ a: { b: 'c' } }
 ```
 
 

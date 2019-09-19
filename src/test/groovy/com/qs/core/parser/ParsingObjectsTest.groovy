@@ -4,6 +4,7 @@
 package com.qs.core.parser
 
 import com.qs.core.QS
+import com.qs.core.model.ParseOptions
 import com.qs.core.model.QSObject
 import com.qs.core.model.StringifyOptions
 import spock.lang.Shared
@@ -141,5 +142,96 @@ class ParsingObjectsTest extends Specification {
         where:
         input                         || expect
         "a[b][c][d][e][f][g][h][i]=j" || defaultDepthObject
+    }
+
+//    { a: { b: { '[c][d][e][f][g][h][i]': 'j' } } }
+    @Shared
+    def depth1Object = new QSObject()
+    @Shared
+    def depth1QString = "a[b][[c][d][e][f][g][h][i]]=j"
+
+    @Unroll
+    def "parse and stringify for depth 1 case"(String input, Object expect) {
+        setup:
+        def cdefghiObject = new QSObject()
+        cdefghiObject.put("[c][d][e][f][g][h][i]", "j")
+        def bObject = new QSObject()
+        bObject.put("b", cdefghiObject)
+        depth1Object.put("a", bObject)
+
+        expect:
+        def result = QS.parse(input, new ParseOptions.Builder().setDepth(1).build())
+        ObjectEqual.equals(result, depth1Object)
+        ObjectEqual.equals(result.toQString(new StringifyOptions.Builder().setEncode(false).build()), depth1QString)
+
+        where:
+        input                         || expect
+        "a[b][c][d][e][f][g][h][i]=j" || depth1Object
+    }
+
+//    { a: 'b' }
+    @Shared
+    def parameterLimit1Object = new QSObject()
+    @Shared
+    def parameterLimit1QString = "a=b"
+
+    @Unroll
+    def "parse and stringify for parameterLimit 1 case"(String input, Object expect) {
+        setup:
+        parameterLimit1Object.put("a", "b")
+
+        expect:
+        def result = QS.parse(input, new ParseOptions.Builder().setParameterLimit(1).build())
+        ObjectEqual.equals(result, parameterLimit1Object)
+        ObjectEqual.equals(result.toQString(new StringifyOptions.Builder().setEncode(false).build()), parameterLimit1QString)
+
+        where:
+        input     || expect
+        "a=b&c=d" || parameterLimit1Object
+    }
+
+//    { a: 'b', c: 'd' }
+    @Shared
+    def ignoreQueryPrefixObject = new QSObject()
+    @Shared
+    def ignoreQueryPrefixQString = "a=b&c=d"
+
+    @Unroll
+    def "parse and stringify for ignore query prefix case"(String input, Object expect) {
+        setup:
+        ignoreQueryPrefixObject.put("a", "b")
+        ignoreQueryPrefixObject.put("c", "d")
+
+        expect:
+        def result = QS.parse(input, new ParseOptions.Builder().setIgnoreQueryPrefix(true).build())
+        ObjectEqual.equals(result, ignoreQueryPrefixObject)
+        ObjectEqual.equals(result.toQString(new StringifyOptions.Builder().setEncode(false).build()), ignoreQueryPrefixQString)
+
+        where:
+        input      || expect
+        "?a=b&c=d" || ignoreQueryPrefixObject
+    }
+
+//    { a: { b: 'c' } }
+    @Shared
+    def allowDotsObject = new QSObject()
+    @Shared
+    def allowDotsQString = "a.b=c"
+
+    @Unroll
+    def "parse and stringify for allow dots case"(String input, Object expect) {
+        setup:
+        def bObject = new QSObject()
+        bObject.put("b", "c")
+        allowDotsObject.put("a", bObject)
+
+        expect:
+        def result = QS.parse(input, new ParseOptions.Builder().setAllowDots(true).build())
+        ObjectEqual.equals(result, allowDotsObject)
+        ObjectEqual.equals(result.toQString(new StringifyOptions.Builder().setEncode(false).setAllowDots(true).build()), allowDotsQString)
+
+        where:
+        input            || expect
+        allowDotsQString || allowDotsObject
     }
 }

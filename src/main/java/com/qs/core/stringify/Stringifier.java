@@ -13,6 +13,9 @@ import java.util.Map;
 public class Stringifier {
 
     private static final String QUERY_PREFIX = "?";
+    private static final char LEFT_SQUARE = '[';
+    private static final char RIGHT_SQUARE = ']';
+    private static final char DOT = '.';
 
     public static String toQString(QSObject object) {
         return toQString(object, new StringifyOptions.Builder().build());
@@ -101,28 +104,35 @@ public class Stringifier {
         int size = pathStack.size();
         for (int i = 0; i < size; ++i) {
             Object path = pathStack.get(i);
-            if (i == 0) {
-                sb.append(path);
-            } else if (i == size - 1) { // 最后一个 path 的处理
-                ArrayFormat format = options.getArrayFormat();
-                if (format == ArrayFormat.INDICES) {
-                    sb.append("[").append(path).append("]");
-                } else if (format == ArrayFormat.BRACKETS) {
-                    if (isIntegerType(path)) {
-                        sb.append("[]");
-                    } else {
-                        sb.append("[").append(path).append("]");
-                    }
-                } else if (format == ArrayFormat.REPEAT) {
-                    if (!isIntegerType(path)) {
-                        sb.append("[").append(path).append("]");
-                    }
-                } else if (format == ArrayFormat.COMMA) {
-                    sb.append("[").append(path).append("]");
-                }
+            if (options.isAllowDots()) {
+                sb.append(path).append(DOT);
             } else {
-                sb.append("[").append(path).append("]");
+                if (i == 0) {
+                    sb.append(path);
+                } else if (i == size - 1) { // 最后一个 path 的处理
+                    ArrayFormat format = options.getArrayFormat();
+                    if (format == ArrayFormat.INDICES) {
+                        sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                    } else if (format == ArrayFormat.BRACKETS) {
+                        if (isIntegerType(path)) {
+                            sb.append(LEFT_SQUARE).append(RIGHT_SQUARE);
+                        } else {
+                            sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                        }
+                    } else if (format == ArrayFormat.REPEAT) {
+                        if (!isIntegerType(path)) {
+                            sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                        }
+                    } else if (format == ArrayFormat.COMMA) {
+                        sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                    }
+                } else {
+                    sb.append(LEFT_SQUARE).append(path).append(RIGHT_SQUARE);
+                }
             }
+        }
+        if (options.isAllowDots()) {
+            sb.deleteCharAt(sb.length() - 1);
         }
         if (options.isEncode()) {
             return QSEncoder.encode(sb.toString());
@@ -149,12 +159,12 @@ public class Stringifier {
 
     private static String toJsonString(QSArray array) {
         StringBuilder sb = new StringBuilder(33);
-        sb.append("[");
+        sb.append(LEFT_SQUARE);
         for (Object value : array) {
             toJsonString(value, sb);
         }
         if (sb.length() > 1) sb.deleteCharAt(sb.length() - 1);
-        sb.append("]");
+        sb.append(LEFT_SQUARE);
         return sb.toString();
     }
 
