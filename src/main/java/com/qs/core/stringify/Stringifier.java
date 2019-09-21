@@ -65,7 +65,7 @@ public class Stringifier {
             if (value != null) {
                 sb.append(toPathString(pathStack, options));
                 sb.append('=');
-                if (options.isEncode() || options.isEncodeValuesOnly()) {
+                if (options.isEncode()) {
                     sb.append(QSEncoder.encode(String.valueOf(value)));
                 } else {
                     sb.append(value);
@@ -81,6 +81,7 @@ public class Stringifier {
         }
         pathStack.remove(pathStack.size() - 1);
         if (value != null || !options.isSkipNulls()) {
+            if (value instanceof QSArray && ((QSArray) value).isEmpty()) return;
             sb.append(options.getDelimiter());
         }
     }
@@ -139,7 +140,7 @@ public class Stringifier {
         if (options.isAllowDots()) {
             sb.deleteCharAt(sb.length() - 1);
         }
-        if (options.isEncode()) {
+        if (options.isEncode() && !options.isEncodeValuesOnly()) {
             return QSEncoder.encode(sb.toString());
         }
         return sb.toString();

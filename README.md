@@ -12,11 +12,13 @@ The idea for Java qs module comes from js [qs][1]
 
 > UTF-8 is supported by default. Can't support set other charset when parsing or stringify.
 
-> Can't support set 'indices' when stringify. I think that the parameter is conflict with arrayFormat's 'indices'.
+> Can't support set 'indices' when stringify. I think that the parameter is conflict with arrayFormat's 'repeat'.
 
 > Can't support skip add element for arrayFormat's 'indices' when parsing.
 
 > Can't support set 'arrayLimit' when parsing. the implementation way does not need to rely on this.
+
+> Can't support custom encoder when parsing or stringify.
 
 # Usage
 
@@ -168,6 +170,8 @@ parse result
 
 # Parsing Arrays
 
+Test Case: ParsingArraysTest
+
 qs can also parse arrays using a similar [] notation:
 
 ```java
@@ -264,6 +268,123 @@ parse result
 
 (this cannot convert nested objects, such as a={b:1},{c:d})
 
+# Stringifying
+
+Test Case: StringifyingTest
+
+```java
+QS.toQString(object, [options]);
+```
+
+When stringifying, qs by default URI encodes output. Objects are stringified as you would expect:
+
+```java
+QSObject aNoNestedObject = new QSObject();
+aNoNestedObject.put("a", "b");
+ObjectEqual.equals(aNoNestedObject.toQString(), "a=b");
+
+QSObject aNestedObject = new QSObject();
+def bObject = new QSObject();
+bObject.put("b", "c");
+aNestedObject.put("a", bObject);
+ObjectEqual.equals(aNestedObject.toQString(), "a%5Bb%5D=c");
+```
+
+This encoding can be disabled by setting the encode option to false:
+
+```java
+QSObject aNestedObject = new QSObject();
+def bObject = new QSObject();
+bObject.put("b", "c");
+aNestedObject.put("a", bObject);
+ObjectEqual.equals(aNestedObject.toQString(new StringifyOptions.Builder().setEncode(false).build()), "a[b]=c");
+```
+
+Encoding can be disabled for keys by setting the encodeValuesOnly option to true:
+
+```java
+QSObject encodeValuesOnlyObject = new QSObject();
+encodeValuesOnlyObject.put("a", "b");
+def cArray = new QSArray();
+cArray.add("d");
+cArray.add("e=f");
+encodeValuesOnlyObject.put("c", cArray);
+def fArray = new QSArray();
+def childArray1 = new QSArray();
+childArray1.add("g");
+def childArray2 = new QSArray();
+childArray2.add("h");
+fArray.add(childArray1);
+fArray.add(childArray2);
+encodeValuesOnlyObject.put("f", fArray);
+ObjectEqual.equals(encodeValuesOnlyObject.toQString(new StringifyOptions.Builder().setEncodeValuesOnly(true).build()), "a=b&c[0]=d&c[1]=e%3Df&f[0][0]=g&f[1][0]=h");
+```
+
+When arrays are stringified, by default they are given explicit indices:
+
+```java
+QSObject basicArrayObject = new QSObject();
+QSArray aArray = new QSArray();
+aArray.add("b");
+aArray.add("c");
+aArray.add("d");
+basicArrayObject.put("a", aArray);
+ObjectEqual.equals(basicArrayObject.toQString(new StringifyOptions.Builder().setEncode(false).build()), "a[0]=b&a[1]=c&a[2]=d");
+```
+
+You may use the arrayFormat option to specify the format of the output array:
+
+```java
+QSObject arrayFormatObject = new QSObject();
+QSArray aArray = new QSArray();
+aArray.add("b");
+aArray.add("c");
+arrayFormatObject.put("a", aArray);
+ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.INDICES).build()), "a[0]=b&a[1]=c");
+ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.BRACKETS).build()), "a[]=b&a[]=c");
+ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.REPEAT).build()), "a=b&a=c");
+ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.COMMA).build()), "a=b,c");
+```
+
+When objects are stringified, by default they use bracket notation:
+
+```java
+QSObject multiNestedObject = new QSObject();
+QSObject bMultiObject = new QSObject();
+bMultiObject.put("c", "d");
+bMultiObject.put("e", "f");
+QSObject aMultiObject = new QSObject();
+aMultiObject.put("b", bMultiObject);
+multiNestedObject.put("a", aMultiObject);
+ObjectEqual.equals(multiNestedObject.toQString(new StringifyOptions.Builder().setEncode(false).build()), "a[b][c]=d&a[b][e]=f");
+```
+
+You may override this to use dot notation by setting the allowDots option to true:
+
+```java
+QSObject multiNestedObject = new QSObject();
+QSObject bMultiObject = new QSObject();
+bMultiObject.put("c", "d");
+bMultiObject.put("e", "f");
+QSObject aMultiObject = new QSObject();
+aMultiObject.put("b", bMultiObject);
+multiNestedObject.put("a", aMultiObject);
+ObjectEqual.equals(multiNestedObject.toQString(new StringifyOptions.Builder().setEncode(false).setAllowDots(true).build()), "a.b.c=d&a.b.e=f");
+```
+
+Empty strings and null values will omit the value, but the equals sign (=) remains in place:
+
+```java
+QSObject emptyValueObject = new QSObject();
+emptyValueObject.put("a", "");
+ObjectEqual.equals(emptyValueObject.toQString(), "a=");
+```
+
+Key with no values (such as an empty object or array) will return nothing:
+
+```java
+
+```
 
 # License 📄
 
