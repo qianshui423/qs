@@ -20,19 +20,23 @@ The idea for Java qs module comes from js [qs][1]
 
 > Can't support custom encoder when parsing or stringify.
 
+# Remark
+
+To make the document clearer, the examples are pseudo code.
+
 # Usage
 
 Test Case: UsageTest
 
 ## Parse
 
-```java
-QSObject qsObject = QS.parse("a=c");
+```text
+QSObject qsObject = QS.parse('a=c');
 ```
 
 ## Stringify
 
-```java
+```text
 qsObject.toQString();
 // or
 QS.toQString(qsObject);
@@ -42,14 +46,14 @@ QS.toQString(qsObject);
 
 Test Case: ParsingObjectsTest
 
-```java
+```text
 parser.parse(string, [ParseOptions]);
 ```
 
-qs allows you to create nested objects within your query strings, by surrounding the name of sub-keys with square brackets []. For example, the string "foo[bar]=baz" converts to:
+qs allows you to create nested objects within your query strings, by surrounding the name of sub-keys with square brackets []. For example, the string 'foo[bar]=baz' converts to:
 
-```java
-QS.parse("foo[bar]=baz");
+```text
+QS.parse('foo[bar]=baz');
 ```
 
 parse result
@@ -64,8 +68,8 @@ parse result
 
 URI encoded strings work too:
 
-```java
-QS.parse("a%5Bb%5D=c");
+```text
+QS.parse('a%5Bb%5D=c');
 ```
 
 parse result
@@ -76,10 +80,10 @@ parse result
 }
 ```
 
-You can also nest your objects, like "foo[bar][baz]=foobarbaz":
+You can also nest your objects, like 'foo[bar][baz]=foobarbaz':
 
-```java
-QS.parse("foo[bar][baz]=foobarbaz");
+```text
+QS.parse('foo[bar][baz]=foobarbaz');
 ```
 
 parse result
@@ -96,8 +100,8 @@ parse result
 
 By default, when nesting objects qs will only parse up to 5 children deep. This means if you attempt to parse a string like 'a[b][c][d][e][f][g][h][i]=j' your resulting object will be:
 
-```java
-QS.parse("a[b][c][d][e][f][g][h][i]=j");
+```text
+QS.parse('a[b][c][d][e][f][g][h][i]=j');
 ```
 
 parse result
@@ -122,8 +126,8 @@ parse result
 
 This depth can be overridden by passing a depth option to qs.parse(string, [options]):
 
-```java
-QS.parse("a[b][c][d][e][f][g][h][i]=j", new ParseOptions.Builder().setDepth(1).build());
+```text
+QS.parse('a[b][c][d][e][f][g][h][i]=j', new ParseOptions.Builder().setDepth(1).build());
 ```
 
 ```text
@@ -134,8 +138,8 @@ The depth limit helps mitigate abuse when qs is used to parse user input, and it
 
 For similar reasons, by default qs will only parse up to 1000 parameters. This can be overridden by passing a parameterLimit option:
 
-```java
-QS.parse("a=b&c=d", new ParseOptions.Builder().setParameterLimit(1).build());
+```text
+QS.parse('a=b&c=d', new ParseOptions.Builder().setParameterLimit(1).build());
 ```
 
 parse result
@@ -146,8 +150,8 @@ parse result
 
 To bypass the leading question mark, use ignoreQueryPrefix:
 
-```java
-QS.parse("?a=b&c=d", new ParseOptions.Builder().setIgnoreQueryPrefix(true).build());
+```text
+QS.parse('?a=b&c=d', new ParseOptions.Builder().setIgnoreQueryPrefix(true).build());
 ```
 
 parse result
@@ -158,8 +162,8 @@ parse result
 
 Option allowDots can be used to enable dot notation:
 
-```java
-QS.parse("a.b=c", new ParseOptions.Builder().setAllowDots(true).build());
+```text
+QS.parse('a.b=c', new ParseOptions.Builder().setAllowDots(true).build());
 ```
 
 parse result
@@ -174,8 +178,8 @@ Test Case: ParsingArraysTest
 
 qs can also parse arrays using a similar [] notation:
 
-```java
-QS.parse("a[]=b&a[]=c");
+```text
+QS.parse('a[]=b&a[]=c');
 ```
 
 parse result
@@ -186,8 +190,8 @@ parse result
 
 You may specify an index as well:
 
-```java
-QS.parse("a[0]=c&a[1]=b");
+```text
+QS.parse('a[0]=c&a[1]=b');
 ```
 
 parse result
@@ -198,8 +202,8 @@ parse result
 
 Note that an empty string is also a value, and will be preserved:
 
-```java
-QS.parse("a[]=&a[]=b");
+```text
+QS.parse('a[]=&a[]=b');
 ```
 
 parse result
@@ -208,8 +212,8 @@ parse result
 { a: ['', 'b'] }
 ```
 
-```java
-QS.parse("a[0]=b&a[1]=&a[2]=c");
+```te\
+QS.parse('a[0]=b&a[1]=&a[2]=c');
 ```
 
 parse result
@@ -220,8 +224,8 @@ parse result
 
 To disable array parsing entirely, set parseArrays to false.
 
-```java
-QS.parse("a[]=b", new ParseOptions.Builder().setParseArrays(false).build());
+```text
+QS.parse('a[]=b', new ParseOptions.Builder().setParseArrays(false).build());
 ```
 
 parse result
@@ -232,8 +236,8 @@ parse result
 
 If you mix notations, qs will merge the two items into an object:
 
-```java
-QS.parse("a[0]=b&a[b]=c");
+```text
+QS.parse('a[0]=b&a[b]=c');
 ```
 
 parse result
@@ -244,8 +248,8 @@ parse result
 
 You can also create arrays of objects:
 
-```java
-QS.parse("a[][b]=c");
+```text
+QS.parse('a[][b]=c');
 ```
 
 parse result
@@ -256,8 +260,8 @@ parse result
 
 Some people use comma to join array, qs can parse it:
 
-```java
-QS.parse("a=b,c", new ParseOptions.Builder().setComma(true).build());
+```text
+QS.parse('a=b,c', new ParseOptions.Builder().setComma(true).build());
 ```
 
 parse result
@@ -272,119 +276,80 @@ parse result
 
 Test Case: StringifyingTest
 
-```java
+```text
 QS.toQString(object, [options]);
 ```
 
 When stringifying, qs by default URI encodes output. Objects are stringified as you would expect:
 
-```java
-QSObject aNoNestedObject = new QSObject();
-aNoNestedObject.put("a", "b");
-ObjectEqual.equals(aNoNestedObject.toQString(), "a=b");
-
-QSObject aNestedObject = new QSObject();
-def bObject = new QSObject();
-bObject.put("b", "c");
-aNestedObject.put("a", bObject);
-ObjectEqual.equals(aNestedObject.toQString(), "a%5Bb%5D=c");
+```text
+ObjectEqual.equals(QS.toQString({ a: 'b' }), 'a=b');
+ObjectEqual.equals(QS.toQString({ a: { b: 'c' } }), 'a%5Bb%5D=c');
 ```
 
 This encoding can be disabled by setting the encode option to false:
 
-```java
-QSObject aNestedObject = new QSObject();
-def bObject = new QSObject();
-bObject.put("b", "c");
-aNestedObject.put("a", bObject);
-ObjectEqual.equals(aNestedObject.toQString(new StringifyOptions.Builder().setEncode(false).build()), "a[b]=c");
+```text
+ObjectEqual.equals(QS.toQString({ a: { b: 'c' } }, new StringifyOptions.Builder().setEncode(false).build()), 'a[b]=c');
 ```
 
 Encoding can be disabled for keys by setting the encodeValuesOnly option to true:
 
-```java
-QSObject encodeValuesOnlyObject = new QSObject();
-encodeValuesOnlyObject.put("a", "b");
-def cArray = new QSArray();
-cArray.add("d");
-cArray.add("e=f");
-encodeValuesOnlyObject.put("c", cArray);
-def fArray = new QSArray();
-def childArray1 = new QSArray();
-childArray1.add("g");
-def childArray2 = new QSArray();
-childArray2.add("h");
-fArray.add(childArray1);
-fArray.add(childArray2);
-encodeValuesOnlyObject.put("f", fArray);
-ObjectEqual.equals(encodeValuesOnlyObject.toQString(new StringifyOptions.Builder().setEncodeValuesOnly(true).build()), "a=b&c[0]=d&c[1]=e%3Df&f[0][0]=g&f[1][0]=h");
+```text
+ObjectEqual.equals(encodeValuesOnlyObject.toQString(
+        { a: 'b', c: ['d', 'e=f'], f: [['g'], ['h']] },
+        new StringifyOptions.Builder().setEncodeValuesOnly(true).build()), 'a=b&c[0]=d&c[1]=e%3Df&f[0][0]=g&f[1][0]=h');
 ```
 
 When arrays are stringified, by default they are given explicit indices:
 
-```java
-QSObject basicArrayObject = new QSObject();
-QSArray aArray = new QSArray();
-aArray.add("b");
-aArray.add("c");
-aArray.add("d");
-basicArrayObject.put("a", aArray);
-ObjectEqual.equals(basicArrayObject.toQString(new StringifyOptions.Builder().setEncode(false).build()), "a[0]=b&a[1]=c&a[2]=d");
+```text
+ObjectEqual.equals(QS.toQString({ a: ['b', 'c', 'd'] }, new StringifyOptions.Builder().setEncode(false).build()), 'a[0]=b&a[1]=c&a[2]=d');
 ```
 
 You may use the arrayFormat option to specify the format of the output array:
 
-```java
-QSObject arrayFormatObject = new QSObject();
-QSArray aArray = new QSArray();
-aArray.add("b");
-aArray.add("c");
-arrayFormatObject.put("a", aArray);
-ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.INDICES).build()), "a[0]=b&a[1]=c");
-ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.BRACKETS).build()), "a[]=b&a[]=c");
-ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.REPEAT).build()), "a=b&a=c");
-ObjectEqual.equals(arrayFormatObject.toQString(new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.COMMA).build()), "a=b,c");
+```text
+ObjectEqual.equals(QS.toQString({ a: ['b', 'c'] }, new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.INDICES).build()), 'a[0]=b&a[1]=c');
+ObjectEqual.equals(QS.toQString({ a: ['b', 'c'] }, new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.BRACKETS).build()), 'a[]=b&a[]=c');
+ObjectEqual.equals(QS.toQString({ a: ['b', 'c'] }, new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.REPEAT).build()), 'a=b&a=c');
+ObjectEqual.equals(QS.toQString({ a: ['b', 'c'] }, new StringifyOptions.Builder().setEncode(false).setArrayFormat(ArrayFormat.COMMA).build()), 'a=b,c');
 ```
 
 When objects are stringified, by default they use bracket notation:
 
-```java
-QSObject multiNestedObject = new QSObject();
-QSObject bMultiObject = new QSObject();
-bMultiObject.put("c", "d");
-bMultiObject.put("e", "f");
-QSObject aMultiObject = new QSObject();
-aMultiObject.put("b", bMultiObject);
-multiNestedObject.put("a", aMultiObject);
-ObjectEqual.equals(multiNestedObject.toQString(new StringifyOptions.Builder().setEncode(false).build()), "a[b][c]=d&a[b][e]=f");
+```text
+ObjectEqual.equals(QS.toQString({ a: { b: { c: 'd', e: 'f' } } }, new StringifyOptions.Builder().setEncode(false).build()), 'a[b][c]=d&a[b][e]=f');
 ```
 
 You may override this to use dot notation by setting the allowDots option to true:
 
-```java
-QSObject multiNestedObject = new QSObject();
-QSObject bMultiObject = new QSObject();
-bMultiObject.put("c", "d");
-bMultiObject.put("e", "f");
-QSObject aMultiObject = new QSObject();
-aMultiObject.put("b", bMultiObject);
-multiNestedObject.put("a", aMultiObject);
-ObjectEqual.equals(multiNestedObject.toQString(new StringifyOptions.Builder().setEncode(false).setAllowDots(true).build()), "a.b.c=d&a.b.e=f");
+```text
+ObjectEqual.equals(QS.toQString({ a: { b: { c: 'd', e: 'f' } } }, new StringifyOptions.Builder().setEncode(false).setAllowDots(true).build()), 'a.b.c=d&a.b.e=f');
 ```
 
 Empty strings and null values will omit the value, but the equals sign (=) remains in place:
 
-```java
-QSObject emptyValueObject = new QSObject();
-emptyValueObject.put("a", "");
-ObjectEqual.equals(emptyValueObject.toQString(), "a=");
+```text
+ObjectEqual.equals(QS.toQString({ a: '' }), 'a=');
 ```
 
 Key with no values (such as an empty object or array) will return nothing:
 
-```java
-
+```text
+ObjectEqual.equals(QS.toQString({ a: [] }), '');
+ObjectEqual.equals(QS.toQString({ a: {} }), '');
+ObjectEqual.equals(QS.toQString({ a: [{}] }), '');
+ObjectEqual.equals(QS.toQString({ a: { b: []} }), '');
+ObjectEqual.equals(QS.toQString({ a: { b: {}} }), '');
 ```
+
+The query string may optionally be prepended with a question mark:
+
+```text
+ObjectEqual.equals(QS.toQString({ a: 'b', c: 'd' }, new StringifyOptions.Builder().setAddQueryPrefix(true).build()), '?a=b&c=d');
+```
+
 
 # License 📄
 
