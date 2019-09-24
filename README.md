@@ -54,11 +54,7 @@ qs allows you to create nested objects within your query strings, by surrounding
 
 ```text
 QS.parse('foo[bar]=baz');
-```
 
-parse result
-
-```text
 {
     foo: {
         bar: 'baz'
@@ -70,25 +66,18 @@ URI encoded strings work too:
 
 ```text
 QS.parse('a%5Bb%5D=c');
-```
 
-parse result
-
-```text
 {
     a: { b: 'c' }
 }
 ```
 
+
 You can also nest your objects, like 'foo[bar][baz]=foobarbaz':
 
 ```text
 QS.parse('foo[bar][baz]=foobarbaz');
-```
 
-parse result
-
-```text
 {
     foo: {
         bar: {
@@ -102,11 +91,7 @@ By default, when nesting objects qs will only parse up to 5 children deep. This 
 
 ```text
 QS.parse('a[b][c][d][e][f][g][h][i]=j');
-```
 
-parse result
-
-```text
 {
     a: {
         b: {
@@ -128,9 +113,7 @@ This depth can be overridden by passing a depth option to qs.parse(string, [opti
 
 ```text
 QS.parse('a[b][c][d][e][f][g][h][i]=j', new ParseOptions.Builder().setDepth(1).build());
-```
 
-```text
 { a: { b: { '[c][d][e][f][g][h][i]': 'j' } } }
 ```
 
@@ -140,11 +123,7 @@ For similar reasons, by default qs will only parse up to 1000 parameters. This c
 
 ```text
 QS.parse('a=b&c=d', new ParseOptions.Builder().setParameterLimit(1).build());
-```
 
-parse result
-
-```text
 { a: 'b' }
 ```
 
@@ -152,11 +131,7 @@ To bypass the leading question mark, use ignoreQueryPrefix:
 
 ```text
 QS.parse('?a=b&c=d', new ParseOptions.Builder().setIgnoreQueryPrefix(true).build());
-```
 
-parse result
-
-```text
 { a: 'b', c: 'd' }
 ```
 
@@ -164,11 +139,7 @@ Option allowDots can be used to enable dot notation:
 
 ```text
 QS.parse('a.b=c', new ParseOptions.Builder().setAllowDots(true).build());
-```
 
-parse result
-
-```text
 { a: { b: 'c' } }
 ```
 
@@ -180,11 +151,7 @@ qs can also parse arrays using a similar [] notation:
 
 ```text
 QS.parse('a[]=b&a[]=c');
-```
 
-parse result
-
-```text
 { a: ['b', 'c'] }
 ```
 
@@ -192,11 +159,7 @@ You may specify an index as well:
 
 ```text
 QS.parse('a[0]=c&a[1]=b');
-```
 
-parse result
-
-```text
 { a: ['b', 'c'] }
 ```
 
@@ -204,21 +167,13 @@ Note that an empty string is also a value, and will be preserved:
 
 ```text
 QS.parse('a[]=&a[]=b');
-```
 
-parse result
-
-```text
 { a: ['', 'b'] }
 ```
 
-```te\
-QS.parse('a[0]=b&a[1]=&a[2]=c');
-```
-
-parse result
-
 ```text
+QS.parse('a[0]=b&a[1]=&a[2]=c');
+
 { a: ['b', '', 'c'] }
 ```
 
@@ -226,11 +181,7 @@ To disable array parsing entirely, set parseArrays to false.
 
 ```text
 QS.parse('a[]=b', new ParseOptions.Builder().setParseArrays(false).build());
-```
 
-parse result
-
-```text
 { a: { '0': 'b' } }
 ```
 
@@ -238,11 +189,7 @@ If you mix notations, qs will merge the two items into an object:
 
 ```text
 QS.parse('a[0]=b&a[b]=c');
-```
 
-parse result
-
-```text
 { a: { '0': 'b', b: 'c' } }
 ```
 
@@ -250,11 +197,7 @@ You can also create arrays of objects:
 
 ```text
 QS.parse('a[][b]=c');
-```
 
-parse result
-
-```text
 { a: [{ b: 'c' }] }
 ```
 
@@ -262,11 +205,7 @@ Some people use comma to join array, qs can parse it:
 
 ```text
 QS.parse('a=b,c', new ParseOptions.Builder().setComma(true).build());
-```
 
-parse result
-
-```text
 { a: ['b', 'c'] }
 ```
 
@@ -349,6 +288,10 @@ The query string may optionally be prepended with a question mark:
 ```text
 ObjectEqual.equals(QS.toQString({ a: 'b', c: 'd' }, new StringifyOptions.Builder().setAddQueryPrefix(true).build()), '?a=b&c=d');
 ```
+
+# Handling of null values
+
+
 
 
 # License 📄
