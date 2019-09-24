@@ -291,8 +291,37 @@ ObjectEqual.equals(QS.toQString({ a: 'b', c: 'd' }, new StringifyOptions.Builder
 
 # Handling of null values
 
+Test Case: HandlingNullTest
 
+By default, null values are treated like empty strings:
 
+```text
+ObjectEqual.equals(QS.toQString({ a: null, b: '' }), 'a=&b=');
+```
+
+Parsing does not distinguish between parameters with and without equal signs. Both are converted to empty strings.
+
+```text
+ObjectEqual.equals(QS.parse('a&b='), { a: '', b: '' });
+```
+
+To distinguish between null values and empty strings use the strictNullHandling flag. In the result string the null values have no = sign:
+
+```text
+ObjectEqual.equals(QS.toQString({ a: null, b: '' }, new StringifyOptions.Builder().setStrictNullHandling(true).build()), 'a&b=');
+```
+
+To parse values without = back to null use the strictNullHandling flag:
+
+```text
+ObjectEqual.equals(QS.parse('a&b=', new ParseOptions.Builder().setStrictNullHandling(true).build()), { a: null, b: '' });
+```
+
+To completely skip rendering keys with null values, use the skipNulls flag:
+
+```text
+ObjectEqual.equals(QS.toQString({ a: 'b', c: null}, new StringifyOptions.Builder().setSkipNulls(true).build()), 'a=b');
+```
 
 # License 📄
 
