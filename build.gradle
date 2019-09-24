@@ -16,6 +16,9 @@ plugins {
     id 'jacoco'
 }
 
+group = 'com.qs.core'
+version = '1.0.0'
+
 repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
