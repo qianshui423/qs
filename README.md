@@ -235,9 +235,7 @@ ObjectEqual.equals(QS.toQString({ a: { b: 'c' } }, new StringifyOptions.Builder(
 Encoding can be disabled for keys by setting the encodeValuesOnly option to true:
 
 ```text
-ObjectEqual.equals(encodeValuesOnlyObject.toQString(
-        { a: 'b', c: ['d', 'e=f'], f: [['g'], ['h']] },
-        new StringifyOptions.Builder().setEncodeValuesOnly(true).build()), 'a=b&c[0]=d&c[1]=e%3Df&f[0][0]=g&f[1][0]=h');
+ObjectEqual.equals(encodeValuesOnlyObject.toQString({ a: 'b', c: ['d', 'e=f'], f: [['g'], ['h']] }, new StringifyOptions.Builder().setEncodeValuesOnly(true).build()), 'a=b&c[0]=d&c[1]=e%3Df&f[0][0]=g&f[1][0]=h');
 ```
 
 When arrays are stringified, by default they are given explicit indices:
