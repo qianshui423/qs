@@ -1,6 +1,6 @@
 # qs
 
-[![Build Status](https://travis-ci.org/qianshui423/qs.svg?branch=master)](https://travis-ci.org/qianshui423/qs)
+[![Build Status](https://travis-ci.org/qianshui423/qs.svg?branch=master)](https://travis-ci.org/qianshui423/qs) [![codecov](https://codecov.io/gh/qianshui423/qs/branch/master/graph/badge.svg)](https://codecov.io/gh/qianshui423/qs)
 
 A querystring parsing and stringifying library.
 
