@@ -34,6 +34,8 @@ class StringifyingTest extends Specification {
     def emptyNestedArrayObject = new QSObject()
     @Shared
     def emptyNestedChildObject = new QSObject()
+    @Shared
+    def addQueryPrefixObject = new QSObject()
 
     @Unroll
     def "stringify case"(QSObject input, StringifyOptions options, String expect) {
@@ -93,6 +95,9 @@ class StringifyingTest extends Specification {
         bEmptyChildObject.put("b", new QSObject())
         emptyNestedChildObject.put("a", bEmptyChildObject)
 
+        addQueryPrefixObject.put("a", "b")
+        addQueryPrefixObject.put("c", "d")
+
         expect:
         ObjectEqual.equals(input.toQString(options), expect)
 
@@ -115,5 +120,6 @@ class StringifyingTest extends Specification {
         emptyArrayChildObject  || new StringifyOptions.Builder().build()                                                       || ""
         emptyNestedArrayObject || new StringifyOptions.Builder().build()                                                       || ""
         emptyNestedChildObject || new StringifyOptions.Builder().build()                                                       || ""
+        addQueryPrefixObject   || new StringifyOptions.Builder().setAddQueryPrefix(true).build()                               || "?a=b&c=d"
     }
 }
