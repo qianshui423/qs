@@ -23,6 +23,7 @@ public class QSExample {
         String queryString8 = "a.b=b.c";
         String queryString9 = "...a...b...=,,a,,b,,";
         String queryString10 = "c1[b2][0][d1]=1&c1[b2][0][d2]=2";
+        String queryString11 = "&a=&=&";
         try {
             QSObject qsObject = QS.parse(queryString,
                     new ParseOptions.Builder()

@@ -12,6 +12,10 @@ public class Logger {
 
     private static boolean sDebug = false;
 
+    public static boolean isDebug() {
+        return sDebug;
+    }
+
     private static final Map<Level, ColorString> sLevelToColor = new HashMap<Level, ColorString>() {{
         put(Level.INFO, ColorString.BLACK);
         put(Level.WARN, ColorString.YELLOW);

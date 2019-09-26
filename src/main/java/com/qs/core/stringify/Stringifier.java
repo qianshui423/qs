@@ -170,7 +170,7 @@ public class Stringifier {
             toJsonString(value, sb);
         }
         if (sb.length() > 1) sb.deleteCharAt(sb.length() - 1);
-        sb.append(LEFT_SQUARE);
+        sb.append(RIGHT_SQUARE);
         return sb.toString();
     }
 

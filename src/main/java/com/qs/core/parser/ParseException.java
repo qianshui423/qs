@@ -67,7 +67,7 @@ public class ParseException extends Exception {
                 sb.append("skip add exception at position ").append(mPosition).append(". ").append("can't support skip add. please check path").append(": ").append(mUnexpectedObject);
                 break;
             case ERROR_PARSE_PATH_EXCEPTION:
-                sb.append("parse path exception at position ").append(mPosition).append(". ").append("bracket not in couples. please check path").append(": ").append(mUnexpectedObject);
+                sb.append("parse path exception at position ").append(mPosition).append(". ").append("bracket not in couples or path is empty. please check path").append(": ").append(mUnexpectedObject);
                 break;
             default:
                 sb.append("Unkown error at position ").append(mPosition).append(".");

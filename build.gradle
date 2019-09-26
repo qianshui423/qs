@@ -39,6 +39,8 @@ dependencies {
     // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:1.2-groovy-2.5'
     testImplementation 'junit:junit:4.12'
+
+    testImplementation 'com.google.code.gson:gson:2.8.5'
 }
 
 jacocoTestReport {
