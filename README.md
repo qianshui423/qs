@@ -6,6 +6,14 @@ A querystring parsing and stringifying library.
 
 The idea for Java qs module comes from js [qs][1]
 
+# Gradle dependencies 
+
+```text
+maven { url 'https://jitpack.io' }
+
+implementation 'com.github.qianshui423:qs:1.0.0'
+```
+
 # Different from js qs
 
 > PlainObjects is supported by default. 'plainObjects', 'allowPrototypes' and 'delimiter' parameter are not supported when parsing .
